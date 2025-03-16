@@ -88,10 +88,11 @@ const NavBar = ({ onCartClick, cartItemCount: propCartItemCount }: NavBarProps) 
                     to={link.href}
                     className={cn(
                       "font-medium transition-colors",
-                      isActivePath(link.href) ? "text-cafePurple font-semibold" : "",
-                      isScrolled
-                        ? "text-gray-700 hover:text-cafePurple"
-                        : "text-white hover:text-white/80"
+                      isActivePath(link.href) 
+                        ? "text-cafePurple font-semibold" 
+                        : isScrolled
+                          ? "text-gray-700 hover:text-cafePurple"
+                          : "text-white hover:text-white/80"
                     )}
                   >
                     {link.name}
@@ -99,21 +100,23 @@ const NavBar = ({ onCartClick, cartItemCount: propCartItemCount }: NavBarProps) 
                 ))}
               </div>
               
-              <Button 
-                onClick={handleCartClick} 
-                variant="ghost" 
-                className={cn(
-                  "relative",
-                  isScrolled ? "" : "text-white hover:bg-white/10"
-                )}
-              >
-                <ShoppingBag className="w-5 h-5" />
+              <div className="relative">
+                <Button 
+                  onClick={handleCartClick} 
+                  variant="ghost" 
+                  className={cn(
+                    "relative",
+                    isScrolled ? "" : "text-white hover:bg-white/10"
+                  )}
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                </Button>
                 {cartItemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-cafePurple text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-cafePurple text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                     {cartItemCount}
                   </span>
                 )}
-              </Button>
+              </div>
               
               <UserMenu isScrolled={isScrolled} />
               
@@ -132,22 +135,23 @@ const NavBar = ({ onCartClick, cartItemCount: propCartItemCount }: NavBarProps) 
 
             {/* Mobile Navigation */}
             <div className="flex items-center md:hidden">
-              <Button 
-                onClick={handleCartClick} 
-                variant="ghost" 
-                size="sm" 
-                className={cn(
-                  "relative mr-2",
-                  isScrolled ? "" : "text-white hover:bg-white/10"
-                )}
-              >
-                <ShoppingBag className="w-5 h-5" />
+              <div className="relative mr-2">
+                <Button 
+                  onClick={handleCartClick} 
+                  variant="ghost" 
+                  size="sm" 
+                  className={cn(
+                    isScrolled ? "" : "text-white hover:bg-white/10"
+                  )}
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                </Button>
                 {cartItemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-cafePurple text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-cafePurple text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                     {cartItemCount}
                   </span>
                 )}
-              </Button>
+              </div>
               
               <UserMenu isScrolled={isScrolled} />
               
