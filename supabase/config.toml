@@ -1,1 +1,6 @@
+
 project_id = "ypedypnxcsikqvzjqcvy"
+
+[storage.products]
+enabled = true
+public = true

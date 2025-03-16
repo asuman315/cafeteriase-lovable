@@ -1,12 +1,14 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Coffee, Utensils, Cake, Star, ArrowLeft, Save, X, Plus, Image, Trash2 } from "lucide-react";
+import { Coffee, Utensils, Cake, Star, ArrowLeft, Save, X, Plus, Image, Trash2, Upload } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { v4 as uuidv4 } from 'uuid';
+import { supabase } from "@/integrations/supabase/client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -80,18 +82,86 @@ const Admin = () => {
     defaultValues,
   });
 
+  // Upload image to Supabase Storage
+  const uploadImage = async (file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${uuidv4()}.${fileExt}`;
+      const filePath = `products/${fileName}`;
+      
+      // Create a URL that can be used to display the image
+      const { data, error } = await supabase.storage
+        .from('products')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (error) {
+        console.error('Error uploading image:', error);
+        return null;
+      }
+      
+      // Generate a public URL for the uploaded image
+      const { data: { publicUrl } } = supabase.storage
+        .from('products')
+        .getPublicUrl(filePath);
+        
+      return publicUrl;
+    } catch (error) {
+      console.error('Error in uploadImage:', error);
+      return null;
+    }
+  };
+
   // Handle form submission
   const onSubmit = async (data: ProductFormValues) => {
     setIsLoading(true);
     
     try {
-      // In a real app, you would upload the images and send data to your API/backend
-      console.log("Product data:", data);
+      // Upload all images to Supabase Storage and get their URLs
+      const imageFiles = data.images.filter(img => img instanceof File) as File[];
+      const imageUrls: string[] = [];
       
-      // For demo purposes, we'll just show a success toast
+      // Upload all images in parallel
+      const imagePromises = imageFiles.map(file => uploadImage(file));
+      const uploadedImages = await Promise.all(imagePromises);
+      
+      // Filter out any failed uploads
+      uploadedImages.forEach(url => {
+        if (url) imageUrls.push(url);
+      });
+      
+      // If we couldn't upload any images, show an error
+      if (imageUrls.length === 0 && imageFiles.length > 0) {
+        throw new Error("Failed to upload images. Please try again.");
+      }
+
+      // Create the product in the database
+      const { data: product, error } = await supabase
+        .from('cafe_products')
+        .insert({
+          name: data.name,
+          description: data.description,
+          price: data.price,
+          category: data.category,
+          currency: data.currency,
+          images: imageUrls,
+          featured: data.featured
+        })
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
+      
+      // Show a success message
       toast({
         title: "Product created",
         description: `${data.name} has been added to the ${data.category} category.`,
+        variant: "default",
+        className: "bg-green-50 border-green-200 text-green-800",
       });
       
       // Reset form and previews
@@ -105,6 +175,7 @@ const Admin = () => {
         title: "Error",
         description: "There was an error creating the product. Please try again.",
         variant: "destructive",
+        className: "bg-red-50 border-red-200 text-red-800",
       });
     } finally {
       setIsLoading(false);
@@ -496,8 +567,17 @@ const Admin = () => {
                   className="w-full bg-cafePurple hover:bg-cafePurple-dark"
                   disabled={isLoading}
                 >
-                  <Save className="mr-2 h-4 w-4" />
-                  {isLoading ? "Creating..." : "Create Product"}
+                  {isLoading ? (
+                    <>
+                      <Upload className="mr-2 h-4 w-4 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="mr-2 h-4 w-4" />
+                      Create Product
+                    </>
+                  )}
                 </Button>
               </form>
             </Form>

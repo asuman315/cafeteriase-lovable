@@ -118,28 +118,37 @@ export type Database = {
       }
       cafe_products: {
         Row: {
+          category: string | null
           created_at: string
+          currency: string | null
           description: string | null
+          featured: boolean | null
           id: string
-          image_url: string | null
+          images: Json | null
           name: string
           price: number
           updated_at: string
         }
         Insert: {
+          category?: string | null
           created_at?: string
+          currency?: string | null
           description?: string | null
+          featured?: boolean | null
           id?: string
-          image_url?: string | null
+          images?: Json | null
           name: string
           price: number
           updated_at?: string
         }
         Update: {
+          category?: string | null
           created_at?: string
+          currency?: string | null
           description?: string | null
+          featured?: boolean | null
           id?: string
-          image_url?: string | null
+          images?: Json | null
           name?: string
           price?: number
           updated_at?: string

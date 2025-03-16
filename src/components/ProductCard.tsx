@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { ShoppingCart, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { type Product } from "@/pages/Products";
+import { useState } from "react";
+import { toast } from "@/hooks/use-toast";
 
 interface ProductCardProps {
   product: Product;
@@ -10,6 +12,48 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product, index }: ProductCardProps) => {
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+  
+  // Get currency symbol based on product currency
+  const getCurrencySymbol = (currency: string) => {
+    switch (currency) {
+      case "USD":
+        return "$";
+      case "UGX":
+        return "USh";
+      case "EUR":
+        return "€";
+      case "GBP":
+        return "£";
+      case "CAD":
+        return "C$";
+      case "AUD":
+        return "A$";
+      default:
+        return "$";
+    }
+  };
+  
+  // Format price based on currency
+  const formatPrice = (price: number, currency: string) => {
+    return `${getCurrencySymbol(currency)} ${price.toFixed(currency === "UGX" ? 0 : 2)}`;
+  };
+  
+  // Handle adding product to cart
+  const handleAddToCart = () => {
+    setIsAddingToCart(true);
+    
+    // Simulate adding to cart with a timeout
+    setTimeout(() => {
+      toast({
+        title: "Added to cart",
+        description: `${product.name} has been added to your cart.`,
+        className: "bg-green-50 border-green-200 text-green-800",
+      });
+      setIsAddingToCart(false);
+    }, 600);
+  };
+  
   return (
     <motion.div
       className="menu-card h-full flex flex-col overflow-hidden"
@@ -44,7 +88,7 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
       <div className="p-5 flex flex-col flex-grow">
         <div className="flex justify-between items-start mb-2">
           <h3 className="font-semibold text-xl line-clamp-1">{product.name}</h3>
-          <span className="text-cafePurple font-semibold">${product.price.toFixed(2)}</span>
+          <span className="text-cafePurple font-semibold">{formatPrice(product.price, product.currency)}</span>
         </div>
         
         <p className="text-muted-foreground text-sm mb-4 line-clamp-2 flex-grow">
@@ -53,9 +97,11 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
         
         <Button 
           className="w-full bg-cafePurple hover:bg-cafePurple-dark group"
+          onClick={handleAddToCart}
+          disabled={isAddingToCart}
         >
-          <ShoppingCart className="mr-2 h-4 w-4 group-hover:animate-bounce" /> 
-          Add to Cart
+          <ShoppingCart className={`mr-2 h-4 w-4 ${isAddingToCart ? 'animate-bounce' : 'group-hover:animate-bounce'}`} /> 
+          {isAddingToCart ? "Adding..." : "Add to Cart"}
         </Button>
       </div>
     </motion.div>
