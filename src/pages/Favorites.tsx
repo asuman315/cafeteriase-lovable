@@ -11,73 +11,18 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { Product } from "@/types";
+import { useFavorites } from "@/hooks/use-favorites";
+import { useCart } from "@/hooks/use-cart";
 
 const Favorites = () => {
-  const [cartItemCount, setCartItemCount] = useState(0);
-  const [favoriteIds, setFavoriteIds] = useState<string[]>(() => {
-    // Get favorites from localStorage on initial load
-    const saved = localStorage.getItem('favorites');
-    return saved ? JSON.parse(saved) : ['1', '2', '3']; // Default some IDs for demo
-  });
-
-  // Save favorites to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('favorites', JSON.stringify(favoriteIds));
-  }, [favoriteIds]);
+  const { favorites, removeFromFavorites, clearFavorites } = useFavorites();
+  const { totalItems: cartItemCount } = useCart();
 
   // Handle cart click for NavBar
   const handleCartClick = () => {
     toast({
       title: "Cart",
-      description: "Cart functionality is not implemented yet.",
-    });
-  };
-
-  // Fetch all products
-  const { data: allProducts = [], isLoading } = useQuery({
-    queryKey: ['allProducts'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('cafe_products')
-        .select('*');
-        
-      if (error) throw error;
-      
-      return data.map(item => ({
-        id: item.id,
-        name: item.name,
-        description: item.description || '',
-        price: item.price,
-        image: item.images && item.images[0] ? item.images[0] : '/placeholder.svg',
-        images: item.images || ['/placeholder.svg'],
-        category: item.category || 'Coffee',
-        featured: item.featured || false,
-        currency: item.currency || 'USD',
-        isFavorite: true
-      })) as Product[];
-    },
-  });
-
-  // Filter to only favorite products
-  const favoriteProducts = allProducts.filter(product => 
-    favoriteIds.includes(product.id)
-  );
-
-  // Remove from favorites
-  const removeFromFavorites = (id: string) => {
-    setFavoriteIds(prev => prev.filter(fId => fId !== id));
-    toast({
-      title: "Removed from favorites",
-      description: "The item has been removed from your favorites.",
-    });
-  };
-
-  // Clear all favorites
-  const clearAllFavorites = () => {
-    setFavoriteIds([]);
-    toast({
-      title: "Favorites cleared",
-      description: "All items have been removed from your favorites.",
+      description: "Check your cart items!",
     });
   };
 
@@ -96,10 +41,10 @@ const Favorites = () => {
       <section className="container mx-auto px-4 py-12">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-bold">Your Favorite Items</h2>
-          {favoriteProducts.length > 0 && (
+          {favorites.length > 0 && (
             <Button 
               variant="outline" 
-              onClick={clearAllFavorites}
+              onClick={clearFavorites}
               className="text-red-500 border-red-200 hover:bg-red-50"
             >
               <HeartOff className="mr-2 h-4 w-4" />
@@ -108,11 +53,7 @@ const Favorites = () => {
           )}
         </div>
         
-        {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cafePurple"></div>
-          </div>
-        ) : favoriteProducts.length === 0 ? (
+        {favorites.length === 0 ? (
           <motion.div 
             className="text-center py-16 bg-white rounded-xl shadow-sm"
             initial={{ opacity: 0 }}
@@ -129,7 +70,7 @@ const Favorites = () => {
           </motion.div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {favoriteProducts.map((product, index) => (
+            {favorites.map((product, index) => (
               <motion.div 
                 key={product.id}
                 className="relative"
@@ -145,7 +86,7 @@ const Favorites = () => {
                 >
                   <Heart className="h-5 w-5 fill-current" />
                 </Button>
-                <ProductCard product={product} index={index} />
+                <ProductCard product={{...product, isFavorite: true}} index={index} />
               </motion.div>
             ))}
           </div>

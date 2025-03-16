@@ -3,9 +3,11 @@ import { motion } from "framer-motion";
 import { ShoppingCart, Star, Eye, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { type Product } from "@/types";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
+import { useCart } from "@/hooks/use-cart";
+import { useFavorites } from "@/hooks/use-favorites";
 
 interface ProductCardProps {
   product: Product;
@@ -14,13 +16,9 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, index }: ProductCardProps) => {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
-  
-  // Check if product is in favorites when component mounts
-  useEffect(() => {
-    const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
-    setIsFavorite(favorites.some((fav: Product) => fav.id === product.id));
-  }, [product.id]);
+  const { addToCart } = useCart();
+  const { toggleFavorite, isFavorite } = useFavorites();
+  const favoriteStatus = product.isFavorite !== undefined ? product.isFavorite : isFavorite(product.id);
   
   // Get currency symbol based on product currency
   const getCurrencySymbol = (currency: string) => {
@@ -62,25 +60,8 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
     e.stopPropagation();
     setIsAddingToCart(true);
     
-    // Get existing cart items or initialize empty array
-    const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
-    
-    // Check if product is already in cart
-    const existingItemIndex = cartItems.findIndex((item: Product) => item.id === product.id);
-    
-    if (existingItemIndex >= 0) {
-      // Increment quantity if already in cart
-      cartItems[existingItemIndex].quantity = (cartItems[existingItemIndex].quantity || 1) + 1;
-    } else {
-      // Add new item to cart with quantity 1
-      cartItems.push({
-        ...product,
-        quantity: 1
-      });
-    }
-    
-    // Save updated cart to localStorage
-    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    // Add to cart using our hook
+    addToCart(product);
     
     // Simulate adding to cart with a timeout
     setTimeout(() => {
@@ -98,30 +79,13 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
     e.preventDefault();
     e.stopPropagation();
     
-    // Get existing favorites
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    const newStatus = toggleFavorite(product);
     
-    if (isFavorite) {
-      // Remove from favorites
-      const updatedFavorites = favorites.filter((fav: Product) => fav.id !== product.id);
-      localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
-      setIsFavorite(false);
-      toast({
-        title: "Removed from favorites",
-        description: `${product.name} has been removed from your favorites.`,
-        className: "bg-orange-50 border-orange-200 text-orange-800",
-      });
-    } else {
-      // Add to favorites
-      favorites.push(product);
-      localStorage.setItem('favorites', JSON.stringify(favorites));
-      setIsFavorite(true);
-      toast({
-        title: "Added to favorites",
-        description: `${product.name} has been added to your favorites.`,
-        className: "bg-purple-50 border-purple-200 text-purple-800",
-      });
-    }
+    toast({
+      title: newStatus ? "Added to favorites" : "Removed from favorites",
+      description: `${product.name} has been ${newStatus ? "added to" : "removed from"} your favorites.`,
+      className: newStatus ? "bg-purple-50 border-purple-200 text-purple-800" : "bg-orange-50 border-orange-200 text-orange-800",
+    });
   };
   
   return (
@@ -147,9 +111,9 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
             )}
             <button
               onClick={handleToggleFavorite}
-              className={`p-1.5 rounded-full ${isFavorite ? 'bg-red-500 text-white' : 'bg-white text-gray-500'}`}
+              className={`p-1.5 rounded-full ${favoriteStatus ? 'bg-red-500 text-white' : 'bg-white text-gray-500'}`}
             >
-              <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
+              <Heart className={`h-4 w-4 ${favoriteStatus ? 'fill-current' : ''}`} />
             </button>
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">

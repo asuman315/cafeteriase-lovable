@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Coffee, Cake, UtensilsCrossed } from "lucide-react";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -31,7 +32,6 @@ const HeroSection = () => {
   
   return (
     <section id="home" className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-cafePurple-dark">
-      {/* Background image with animation */}
       <div className="absolute inset-0 w-full h-full">
         <AnimatePresence mode="wait" initial={false}>
           {images.map((image, index) => (
@@ -93,9 +93,9 @@ const HeroSection = () => {
               <Button 
                 className="bg-white text-cafePurple hover:bg-white/90 px-10 py-6 text-lg rounded-full shadow-lg 
                           transition-all duration-300 hover:scale-105 hover:shadow-xl"
-                onClick={scrollToMenu}
+                asChild
               >
-                Start Ordering
+                <Link to="/products">Start Ordering</Link>
               </Button>
               <Button 
                 variant="outline" 
