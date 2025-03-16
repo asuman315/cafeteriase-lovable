@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -20,7 +19,6 @@ const ProductDetail = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItemCount, setCartItemCount] = useState(0);
 
-  // Update cart count when component mounts or cart changes
   useEffect(() => {
     const updateCartCount = () => {
       const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
@@ -28,13 +26,10 @@ const ProductDetail = () => {
       setCartItemCount(count);
     };
     
-    // Initial update
     updateCartCount();
     
-    // Listen for storage events to update cart count
     window.addEventListener('storage', updateCartCount);
     
-    // Custom event for cart updates
     const handleCartUpdate = () => updateCartCount();
     window.addEventListener('cartUpdated', handleCartUpdate);
     
@@ -44,7 +39,6 @@ const ProductDetail = () => {
     };
   }, []);
 
-  // Fetch product details
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', id],
     queryFn: async () => {
@@ -79,11 +73,9 @@ const ProductDetail = () => {
   const handleAddToCart = () => {
     if (product) {
       addToCart({
-        ...product,
-        quantity
-      });
+        ...product
+      }, quantity);
       
-      // Dispatch custom event
       window.dispatchEvent(new Event('cartUpdated'));
     }
   };
@@ -108,7 +100,6 @@ const ProductDetail = () => {
     setQuantity(prev => prev + 1);
   };
 
-  // Handle cart click
   const handleCartClick = () => {
     setIsCartOpen(true);
   };

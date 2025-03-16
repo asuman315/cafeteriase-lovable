@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Product } from '@/types';
 
@@ -54,7 +53,7 @@ export function useCart() {
     setTotalPrice(price);
   };
 
-  // Add item to cart
+  // Add item to cart - now accepting separate quantity parameter
   const addToCart = (product: Product, quantity = 1) => {
     setCartItems(prevItems => {
       const existingItemIndex = prevItems.findIndex(item => item.id === product.id);
@@ -65,7 +64,7 @@ export function useCart() {
         newItems = [...prevItems];
         newItems[existingItemIndex].quantity += quantity;
       } else {
-        // Add new item
+        // Add new item with proper type casting
         newItems = [...prevItems, { ...product, quantity }];
       }
 
