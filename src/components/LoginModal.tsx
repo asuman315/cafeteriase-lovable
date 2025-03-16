@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { MailIcon, LockIcon, UserIcon } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface LoginModalProps {
   open: boolean;
@@ -47,7 +47,7 @@ const LoginModal = ({ open, onOpenChange, onSuccess, forceOpen = false, hideAdmi
 
         if (error) throw error;
 
-        toast({
+        toast.success({
           title: "Login successful",
           description: "Welcome back!",
         });
@@ -66,7 +66,7 @@ const LoginModal = ({ open, onOpenChange, onSuccess, forceOpen = false, hideAdmi
 
         if (error) throw error;
 
-        toast({
+        toast.success({
           title: "Signup successful",
           description: "Please check your email to confirm your account.",
         });
@@ -75,6 +75,10 @@ const LoginModal = ({ open, onOpenChange, onSuccess, forceOpen = false, hideAdmi
       }
     } catch (error: any) {
       setError(error.message || "An error occurred during authentication");
+      toast.error({
+        title: "Authentication failed",
+        description: error.message || "An error occurred during authentication",
+      });
     } finally {
       setLoading(false);
     }

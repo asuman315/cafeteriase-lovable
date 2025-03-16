@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import type {
@@ -166,6 +167,22 @@ function toast({ ...props }: Toast) {
     dismiss,
     update,
   }
+}
+
+// Helper function for success toast
+toast.success = (props: Omit<Toast, "variant">) => {
+  return toast({
+    ...props,
+    variant: "success",
+  })
+}
+
+// Helper function for error toast
+toast.error = (props: Omit<Toast, "variant">) => {
+  return toast({
+    ...props,
+    variant: "error",
+  })
 }
 
 function useToast() {
