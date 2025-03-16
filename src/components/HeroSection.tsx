@@ -1,8 +1,9 @@
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Coffee, Cake } from "lucide-react";
+import { ChevronDown, Coffee, Cake, UtensilsCrossed } from "lucide-react";
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
 
 const HeroSection = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -30,77 +31,152 @@ const HeroSection = () => {
   };
   
   return (
-    <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
+    <section id="home" className="relative h-[85vh] flex items-center justify-center overflow-hidden">
       {/* Background image with animation */}
       <div className="absolute inset-0 w-full h-full">
-        {images.map((image, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentImageIndex ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            <div className="absolute inset-0 bg-gradient-to-b from-cafePurple-dark/60 to-cafePurple/60" />
-            <img
-              src={image}
-              alt="Hero background"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        ))}
+        <AnimatePresence mode="wait">
+          {images.map((image, index) => (
+            index === currentImageIndex && (
+              <motion.div
+                key={image}
+                className="absolute inset-0"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1.2, ease: "easeInOut" }}
+              >
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-b from-cafePurple-dark/50 via-cafePurple/40 to-cafePurple/60"
+                  initial={{ opacity: 0.5 }}
+                  animate={{ opacity: 0.7 }}
+                  transition={{ duration: 1.5 }}
+                />
+                <img
+                  src={image}
+                  alt="Hero background"
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
+            )
+          ))}
+        </AnimatePresence>
       </div>
       
       <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="flex flex-col md:flex-row items-center justify-between">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-12">
           <motion.div 
             className="max-w-xl space-y-6 text-center md:text-left"
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
-              Exceptional Coffee,<br />Extraordinary Food
-            </h1>
-            <p className="text-xl text-white/90 mb-8">
-              Experience the perfect blend of flavor and ambiance at Cafeteriase.
-              Order now and taste the difference.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
-              <Button onClick={scrollToMenu} className="bg-white text-cafePurple hover:bg-gray-100 px-8 py-6 text-lg">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <h2 className="text-white/80 font-medium text-xl mb-2">Welcome to Cafeteriase</h2>
+              <h1 className="text-5xl md:text-6xl font-bold text-white leading-tight">
+                Order Modern<br />Meals & Drinks
+              </h1>
+            </motion.div>
+            
+            <motion.p 
+              className="text-xl text-white/90 max-w-md"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+            >
+              Experience the perfect blend of flavor and ambiance, delivered to you.
+            </motion.p>
+            
+            <motion.div 
+              className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 mt-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+            >
+              <Button 
+                className="bg-white text-cafePurple hover:bg-white/90 px-10 py-6 text-lg rounded-full shadow-lg 
+                          transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                onClick={scrollToMenu}
+              >
+                Start Ordering
+              </Button>
+              <Button 
+                variant="outline" 
+                className="border-white/70 bg-transparent text-white hover:bg-white/10 px-8 py-6 text-lg rounded-full
+                          backdrop-blur-sm transition-all duration-300"
+                onClick={scrollToMenu}
+              >
                 Explore Menu
               </Button>
-              <Button variant="outline" className="border-white hover:bg-white/10 px-8 py-6 text-lg text-white">
-                Order Now
-              </Button>
-            </div>
+            </motion.div>
           </motion.div>
           
           <motion.div 
-            className="hidden md:flex gap-4 mt-10 md:mt-0"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            className="hidden md:grid grid-cols-2 gap-6"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
           >
-            <div className="flex flex-col gap-4">
-              <div className="glass-morphism w-40 h-40 rounded-2xl flex flex-col items-center justify-center text-white">
-                <Coffee className="w-12 h-12 mb-2" />
-                <span className="font-medium">Premium Coffee</span>
-              </div>
-              <div className="glass-morphism w-40 h-40 rounded-2xl flex flex-col items-center justify-center text-white">
-                <Cake className="w-12 h-12 mb-2" />
-                <span className="font-medium">Delicious Treats</span>
-              </div>
-            </div>
+            <HoverCard>
+              <HoverCardTrigger asChild>
+                <motion.div 
+                  className="glass-card h-36 w-36 rounded-2xl flex flex-col items-center justify-center text-white cursor-pointer
+                            backdrop-blur-md bg-white/10 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300"
+                  whileHover={{ y: -5, scale: 1.05 }}
+                >
+                  <Coffee className="w-10 h-10 mb-2 text-white/90" />
+                  <span className="font-medium">Premium Coffee</span>
+                </motion.div>
+              </HoverCardTrigger>
+              <HoverCardContent className="w-80 bg-white/90 backdrop-blur-md border-white/20">
+                <div className="flex justify-between space-x-4">
+                  <div className="space-y-1">
+                    <h4 className="text-sm font-semibold">Artisan Coffee</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Expertly crafted by our skilled baristas using ethically sourced beans.
+                    </p>
+                  </div>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+            
+            <motion.div 
+              className="glass-card h-36 w-36 rounded-2xl flex flex-col items-center justify-center text-white cursor-pointer
+                        backdrop-blur-md bg-white/10 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300
+                        translate-y-12"
+              whileHover={{ y: 42, scale: 1.05 }}
+            >
+              <UtensilsCrossed className="w-10 h-10 mb-2 text-white/90" />
+              <span className="font-medium">Gourmet Food</span>
+            </motion.div>
+            
+            <motion.div 
+              className="glass-card h-36 w-36 rounded-2xl flex flex-col items-center justify-center text-white cursor-pointer
+                        backdrop-blur-md bg-white/10 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-300
+                        translate-y-[-12px]"
+              whileHover={{ y: -17, scale: 1.05 }}
+            >
+              <Cake className="w-10 h-10 mb-2 text-white/90" />
+              <span className="font-medium">Sweet Treats</span>
+            </motion.div>
           </motion.div>
         </div>
       </div>
       
-      <button 
+      <motion.button 
         onClick={scrollToMenu} 
-        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white animate-bounce"
+        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white/80 hover:text-white
+                  transition-colors duration-300 bg-white/10 backdrop-blur-sm rounded-full p-2"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 1, repeat: Infinity, repeatType: "reverse", repeatDelay: 1 }}
+        whileHover={{ scale: 1.1 }}
       >
-        <ChevronDown className="h-10 w-10" />
-      </button>
+        <ChevronDown className="h-8 w-8" />
+      </motion.button>
     </section>
   );
 };
