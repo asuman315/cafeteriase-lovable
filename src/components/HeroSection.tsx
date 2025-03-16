@@ -29,7 +29,7 @@ const HeroSection = () => {
               <Button onClick={scrollToMenu} className="bg-white text-cafePurple hover:bg-gray-100 px-8 py-6 text-lg">
                 Explore Menu
               </Button>
-              <Button variant="outline" className="border-white hover:bg-white/10 px-8 py-6 text-lg text-white">
+              <Button variant="outline" className="border-white hover:bg-white/10 px-8 py-6 text-lg text-cafeGray-light font-medium">
                 Order Now
               </Button>
             </div>
