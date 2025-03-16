@@ -1,5 +1,7 @@
+
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
+
 const HeroSection = () => {
   const scrollToMenu = () => {
     const menuSection = document.getElementById("menu");
@@ -9,6 +11,7 @@ const HeroSection = () => {
       });
     }
   };
+  
   return <section id="home" className="relative h-screen flex items-center justify-center bg-hero-pattern bg-cover bg-center">
       <div className="absolute inset-0 bg-gradient-to-b from-cafePurple-dark/60 to-cafePurple/60" />
       
@@ -26,7 +29,7 @@ const HeroSection = () => {
               <Button onClick={scrollToMenu} className="bg-white text-cafePurple hover:bg-gray-100 px-8 py-6 text-lg">
                 Explore Menu
               </Button>
-              <Button variant="outline" className="border-white hover:bg-white/10 px-8 py-6 text-lg text-purple-800">
+              <Button variant="outline" className="border-white hover:bg-white/10 px-8 py-6 text-lg text-white">
                 Order Now
               </Button>
             </div>
@@ -48,4 +51,5 @@ const HeroSection = () => {
       </button>
     </section>;
 };
+
 export default HeroSection;
