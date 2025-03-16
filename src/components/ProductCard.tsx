@@ -1,9 +1,9 @@
 
 import { motion } from "framer-motion";
-import { ShoppingCart, Star, Eye } from "lucide-react";
+import { ShoppingCart, Star, Eye, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { type Product } from "@/types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 
@@ -14,6 +14,13 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, index }: ProductCardProps) => {
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  
+  // Check if product is in favorites when component mounts
+  useEffect(() => {
+    const favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+    setIsFavorite(favorites.some((fav: Product) => fav.id === product.id));
+  }, [product.id]);
   
   // Get currency symbol based on product currency
   const getCurrencySymbol = (currency: string) => {
@@ -55,6 +62,26 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
     e.stopPropagation();
     setIsAddingToCart(true);
     
+    // Get existing cart items or initialize empty array
+    const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
+    
+    // Check if product is already in cart
+    const existingItemIndex = cartItems.findIndex((item: Product) => item.id === product.id);
+    
+    if (existingItemIndex >= 0) {
+      // Increment quantity if already in cart
+      cartItems[existingItemIndex].quantity = (cartItems[existingItemIndex].quantity || 1) + 1;
+    } else {
+      // Add new item to cart with quantity 1
+      cartItems.push({
+        ...product,
+        quantity: 1
+      });
+    }
+    
+    // Save updated cart to localStorage
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    
     // Simulate adding to cart with a timeout
     setTimeout(() => {
       toast({
@@ -64,6 +91,37 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
       });
       setIsAddingToCart(false);
     }, 600);
+  };
+  
+  // Handle toggling favorite status
+  const handleToggleFavorite = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Get existing favorites
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    
+    if (isFavorite) {
+      // Remove from favorites
+      const updatedFavorites = favorites.filter((fav: Product) => fav.id !== product.id);
+      localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+      setIsFavorite(false);
+      toast({
+        title: "Removed from favorites",
+        description: `${product.name} has been removed from your favorites.`,
+        className: "bg-orange-50 border-orange-200 text-orange-800",
+      });
+    } else {
+      // Add to favorites
+      favorites.push(product);
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      setIsFavorite(true);
+      toast({
+        title: "Added to favorites",
+        description: `${product.name} has been added to your favorites.`,
+        className: "bg-purple-50 border-purple-200 text-purple-800",
+      });
+    }
   };
   
   return (
@@ -81,11 +139,19 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
           />
-          {product.featured && (
-            <div className="absolute top-3 right-3 bg-cafePurple text-white p-1.5 rounded-full">
-              <Star className="h-4 w-4" />
-            </div>
-          )}
+          <div className="absolute top-3 right-3 flex flex-col gap-2">
+            {product.featured && (
+              <div className="bg-cafePurple text-white p-1.5 rounded-full">
+                <Star className="h-4 w-4" />
+              </div>
+            )}
+            <button
+              onClick={handleToggleFavorite}
+              className={`p-1.5 rounded-full ${isFavorite ? 'bg-red-500 text-white' : 'bg-white text-gray-500'}`}
+            >
+              <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
+            </button>
+          </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
             <div className="p-4 w-full">
               <Button 

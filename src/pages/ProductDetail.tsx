@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -34,12 +34,48 @@ const ProductDetail = () => {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
   const [cartItemCount, setCartItemCount] = useState(0);
+  const [isFavorite, setIsFavorite] = useState(false);
+  
+  // Update cart count and check favorite status
+  useEffect(() => {
+    // Update cart count
+    const updateCartCount = () => {
+      const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
+      const count = cartItems.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
+      setCartItemCount(count);
+    };
+    
+    // Check favorite status
+    const checkFavoriteStatus = () => {
+      if (!id) return;
+      const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+      setIsFavorite(favorites.some((fav: Product) => fav.id === id));
+    };
+    
+    // Initial updates
+    updateCartCount();
+    checkFavoriteStatus();
+    
+    // Listen for storage events
+    window.addEventListener('storage', updateCartCount);
+    window.addEventListener('storage', checkFavoriteStatus);
+    
+    // Custom events
+    const handleCartUpdate = () => updateCartCount();
+    window.addEventListener('cartUpdated', handleCartUpdate);
+    
+    return () => {
+      window.removeEventListener('storage', updateCartCount);
+      window.removeEventListener('storage', checkFavoriteStatus);
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+    };
+  }, [id]);
   
   // Handle cart click (for NavBar)
   const handleCartClick = () => {
     toast({
       title: "Cart",
-      description: "Cart functionality is not implemented yet.",
+      description: "Cart functionality is now implemented! Check your cart.",
     });
   };
   
@@ -60,8 +96,8 @@ const ProductDetail = () => {
         name: data.name,
         description: data.description || '',
         price: data.price,
-        image: data.images && data.images[0] ? data.images[0] : '/placeholder.svg',
-        images: data.images || ['/placeholder.svg'],
+        image: data.images && Array.isArray(data.images) && data.images[0] ? data.images[0] : '/placeholder.svg',
+        images: Array.isArray(data.images) ? data.images : ['/placeholder.svg'],
         category: data.category || 'Coffee',
         featured: data.featured || false,
         currency: data.currency || 'USD'
@@ -89,8 +125,8 @@ const ProductDetail = () => {
         name: item.name,
         description: item.description || '',
         price: item.price,
-        image: item.images && item.images[0] ? item.images[0] : '/placeholder.svg',
-        images: item.images || ['/placeholder.svg'],
+        image: item.images && Array.isArray(item.images) && item.images[0] ? item.images[0] : '/placeholder.svg',
+        images: Array.isArray(item.images) ? item.images : ['/placeholder.svg'],
         category: item.category || 'Coffee',
         featured: item.featured || false,
         currency: item.currency || 'USD'
@@ -133,7 +169,30 @@ const ProductDetail = () => {
     
     setIsAdding(true);
     
-    // Simulate adding to cart (would connect to actual cart functionality)
+    // Get existing cart items
+    const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
+    
+    // Check if product is already in cart
+    const existingItemIndex = cartItems.findIndex((item: any) => item.id === product.id);
+    
+    if (existingItemIndex >= 0) {
+      // Update quantity if already in cart
+      cartItems[existingItemIndex].quantity = (cartItems[existingItemIndex].quantity || 0) + quantity;
+    } else {
+      // Add new item to cart
+      cartItems.push({
+        ...product,
+        quantity: quantity
+      });
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    
+    // Dispatch custom event
+    window.dispatchEvent(new Event('cartUpdated'));
+    
+    // Simulate adding to cart
     setTimeout(() => {
       toast({
         title: "Added to cart",
@@ -143,6 +202,36 @@ const ProductDetail = () => {
       setIsAdding(false);
       setCartItemCount(prev => prev + quantity);
     }, 800);
+  };
+  
+  // Handle toggle favorite
+  const handleToggleFavorite = () => {
+    if (!product) return;
+    
+    // Get existing favorites
+    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+    
+    if (isFavorite) {
+      // Remove from favorites
+      const updatedFavorites = favorites.filter((fav: Product) => fav.id !== product.id);
+      localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+      setIsFavorite(false);
+      toast({
+        title: "Removed from favorites",
+        description: `${product.name} has been removed from your favorites.`,
+        className: "bg-orange-50 border-orange-200 text-orange-800",
+      });
+    } else {
+      // Add to favorites
+      favorites.push(product);
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      setIsFavorite(true);
+      toast({
+        title: "Added to favorites",
+        description: `${product.name} has been added to your favorites.`,
+        className: "bg-purple-50 border-purple-200 text-purple-800",
+      });
+    }
   };
   
   // Nutrition facts - these would come from the database in a real app
@@ -327,10 +416,13 @@ const ProductDetail = () => {
                   <div className="flex gap-3">
                     <Button 
                       variant="outline" 
-                      className="rounded-full p-3 border-gray-300 hover:bg-gray-100 hover:text-cafePurple"
+                      className={`rounded-full p-3 border-gray-300 hover:bg-gray-100 ${
+                        isFavorite ? 'bg-red-500 text-white border-red-500 hover:bg-red-600 hover:text-white' : 'hover:text-cafePurple'
+                      }`}
                       aria-label="Add to favorites"
+                      onClick={handleToggleFavorite}
                     >
-                      <Heart className="h-5 w-5" />
+                      <Heart className={`h-5 w-5 ${isFavorite ? 'fill-current' : ''}`} />
                     </Button>
                     
                     <Button 

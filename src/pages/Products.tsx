@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import ProductCard from "@/components/ProductCard";
@@ -18,6 +18,30 @@ const Products = () => {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [cartItemCount, setCartItemCount] = useState(0);
+  
+  // Update cart count when component mounts or cart changes
+  useEffect(() => {
+    const updateCartCount = () => {
+      const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
+      const count = cartItems.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
+      setCartItemCount(count);
+    };
+    
+    // Initial update
+    updateCartCount();
+    
+    // Listen for storage events to update cart count
+    window.addEventListener('storage', updateCartCount);
+    
+    // Custom event for cart updates
+    const handleCartUpdate = () => updateCartCount();
+    window.addEventListener('cartUpdated', handleCartUpdate);
+    
+    return () => {
+      window.removeEventListener('storage', updateCartCount);
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+    };
+  }, []);
 
   // Handle cart click for NavBar
   const handleCartClick = () => {
@@ -47,12 +71,12 @@ const Products = () => {
           description: item.description || '',
           price: item.price,
           // Use the first image in the array or a placeholder
-          image: item.images && item.images[0] ? item.images[0] : '/placeholder.svg',
-          images: item.images || ['/placeholder.svg'],
+          image: item.images && Array.isArray(item.images) && item.images[0] ? item.images[0] : '/placeholder.svg',
+          images: Array.isArray(item.images) ? item.images : ['/placeholder.svg'],
           category: item.category || 'Coffee',
           featured: item.featured || false,
           currency: item.currency || 'USD'
-        }));
+        })) as Product[];
       } catch (error) {
         toast({
           title: "Error loading products",
