@@ -1,3 +1,4 @@
+
 import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -87,9 +88,11 @@ const Admin = () => {
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${uuidv4()}.${fileExt}`;
-      const filePath = `products/${fileName}`;
+      const filePath = `${fileName}`;
       
-      // Create a URL that can be used to display the image
+      console.log('Uploading image to Supabase Storage:', filePath);
+      
+      // Upload the file to Supabase Storage
       const { data, error } = await supabase.storage
         .from('products')
         .upload(filePath, file, {
@@ -107,6 +110,7 @@ const Admin = () => {
         .from('products')
         .getPublicUrl(filePath);
         
+      console.log('Image uploaded successfully:', publicUrl);
       return publicUrl;
     } catch (error) {
       console.error('Error in uploadImage:', error);
@@ -123,6 +127,8 @@ const Admin = () => {
       const imageFiles = data.images.filter(img => img instanceof File) as File[];
       const imageUrls: string[] = [];
       
+      console.log('Files to upload:', imageFiles.length);
+      
       // Upload all images in parallel
       const imagePromises = imageFiles.map(file => uploadImage(file));
       const uploadedImages = await Promise.all(imagePromises);
@@ -136,6 +142,8 @@ const Admin = () => {
       if (imageUrls.length === 0 && imageFiles.length > 0) {
         throw new Error("Failed to upload images. Please try again.");
       }
+
+      console.log('Images uploaded successfully:', imageUrls);
 
       // Create the product in the database
       const { data: product, error } = await supabase
@@ -153,6 +161,7 @@ const Admin = () => {
         .single();
 
       if (error) {
+        console.error('Error inserting product:', error);
         throw error;
       }
       
