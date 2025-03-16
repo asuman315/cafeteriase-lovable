@@ -128,7 +128,7 @@ const handler = async (req: Request): Promise<Response> => {
       // Send the email
       const emailResponse = await resend.emails.send({
         from: "Orders <onboarding@resend.dev>",
-        to: [orderDetails.email, "asumanssendegeya@gmail.com"], // Send to customer and shop owner
+        to: [orderDetails.email], // Send to customer
         subject: "Your Order Confirmation",
         html: htmlContent,
       });
