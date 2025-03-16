@@ -1,14 +1,13 @@
-
 import { useState, useEffect } from "react";
 import { useCart } from "@/hooks/use-cart";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency } from "@/lib/utils";
 import { CreditCard, Truck, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import ShippingForm from "@/components/ShippingForm";
 import OrderSummary from "@/components/OrderSummary";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import DeliveryPreferencesForm from "@/components/DeliveryPreferencesForm";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,9 +34,9 @@ const Checkout = () => {
   const [deliveryPreferences, setDeliveryPreferences] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, isLoading: authLoading } = useAuth();
 
-  // If not authenticated, redirect to auth page
   useEffect(() => {
     if (!authLoading && !user) {
       toast.error("Please sign in to proceed with checkout");
@@ -45,12 +44,10 @@ const Checkout = () => {
     }
   }, [user, authLoading, navigate]);
 
-  // Helper function to create Stripe checkout session
   const createStripeCheckoutSession = async () => {
     try {
       setIsLoading(true);
       
-      // Build success and cancel URLs
       const successUrl = `${window.location.origin}/checkout?success=true`;
       const cancelUrl = `${window.location.origin}/checkout?canceled=true`;
 
@@ -68,7 +65,6 @@ const Checkout = () => {
       }
 
       if (data?.url) {
-        // Redirect to Stripe Checkout
         window.location.href = data.url;
       } else {
         throw new Error("Failed to create checkout session");
@@ -82,7 +78,6 @@ const Checkout = () => {
     }
   };
 
-  // Check for URL parameters on return from Stripe
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const success = urlParams.get("success");
@@ -91,7 +86,6 @@ const Checkout = () => {
     if (success === "true") {
       setStep(CheckoutStep.CONFIRMATION);
       clearCart();
-      // Remove query parameters
       window.history.replaceState({}, document.title, "/checkout");
     } else if (canceled === "true") {
       toast.error("Payment was canceled", {
@@ -99,32 +93,25 @@ const Checkout = () => {
       });
       setPaymentMethod(null);
       setStep(CheckoutStep.SELECT_METHOD);
-      // Remove query parameters
       window.history.replaceState({}, document.title, "/checkout");
     }
   }, [clearCart]);
 
-  // Helper function to handle payment method selection
   const handleSelectPaymentMethod = (method: PaymentMethod) => {
     setPaymentMethod(method);
     if (method === PaymentMethod.ON_DELIVERY) {
-      // Skip the delivery preferences step and go directly to shipping info
       setStep(CheckoutStep.SHIPPING_INFO);
     } else {
-      // Start Stripe checkout process
       createStripeCheckoutSession();
     }
   };
 
-  // Helper function to handle delivery preferences submission
   const handleDeliveryPreferencesSubmit = (values: any) => {
     setDeliveryPreferences(values);
     setStep(CheckoutStep.SHIPPING_INFO);
   };
 
-  // Helper function to handle form submission for shipping info
   const handleShippingInfoSubmit = (values: any) => {
-    // If delivery preferences were not collected, we'll just use the shipping info
     setShippingInfo(values);
     toast.success("Order placed successfully!", {
       duration: 2000,
@@ -133,7 +120,6 @@ const Checkout = () => {
     clearCart();
   };
 
-  // If cart is empty, redirect to products page
   if (cartItems.length === 0 && step !== CheckoutStep.CONFIRMATION) {
     return (
       <div className="container mx-auto px-4 py-12 max-w-4xl">
@@ -146,7 +132,6 @@ const Checkout = () => {
     );
   }
 
-  // If still loading auth, show loading state
   if (authLoading) {
     return (
       <div className="container mx-auto px-4 py-12 max-w-4xl">
@@ -171,7 +156,7 @@ const Checkout = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-        <div className="md:col-span-3">
+        <div className={`md:col-span-${step === CheckoutStep.CONFIRMATION ? "5" : "3"}`}>
           {step === CheckoutStep.SELECT_METHOD && (
             <div className="grid gap-6">
               <Card className="hover:shadow-lg transition-shadow duration-300">
@@ -246,7 +231,7 @@ const Checkout = () => {
           )}
 
           {step === CheckoutStep.CONFIRMATION && (
-            <Card className="animate-scale-in">
+            <Card className="animate-scale-in mx-auto max-w-xl">
               <CardHeader>
                 <div className="flex items-center justify-center mb-4">
                   <CheckCircle2 className="h-16 w-16 text-green-500" />
@@ -298,13 +283,15 @@ const Checkout = () => {
           )}
         </div>
 
-        <div className="md:col-span-2">
-          <OrderSummary 
-            items={cartItems} 
-            totalPrice={totalPrice} 
-            showItems={step !== CheckoutStep.CONFIRMATION} 
-          />
-        </div>
+        {step !== CheckoutStep.CONFIRMATION && (
+          <div className="md:col-span-2">
+            <OrderSummary 
+              items={cartItems} 
+              totalPrice={totalPrice} 
+              showItems={true} 
+            />
+          </div>
+        )}
       </div>
     </div>
   );

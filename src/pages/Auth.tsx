@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +18,9 @@ const Auth = () => {
   const [error, setError] = useState<string | null>(null);
   
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+  const returnTo = location.state?.returnTo || "/";
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +42,7 @@ const Auth = () => {
           description: "Welcome back!",
         });
 
-        navigate("/");
+        navigate(returnTo);
       } else {
         // Handle signup
         const { error } = await supabase.auth.signUp({
@@ -92,6 +94,11 @@ const Auth = () => {
               {isLogin ? "Sign up" : "Sign in"}
             </button>
           </p>
+          {returnTo === "/checkout" && (
+            <p className="mt-2 text-sm text-cafePurple">
+              Sign in to continue with your checkout
+            </p>
+          )}
         </div>
         
         {error && (
