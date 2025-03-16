@@ -61,8 +61,8 @@ const AboutSection = () => {
           <div className="relative h-[400px] md:h-[600px] rounded-xl overflow-hidden animate-fade-in">
             <div className="absolute inset-0 bg-cafePurple/10 z-10 rounded-xl"></div>
             <img 
-              src="/cafe-interior.jpg" 
-              alt="Cafeteriase Interior" 
+              src="/lovable-uploads/c1cd1677-91bf-469f-b25f-99aa098db4a1.png" 
+              alt="Cafeteriase Interior with wooden tables and hanging greenery" 
               className="absolute inset-0 w-full h-full object-cover rounded-xl"
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-cafePurple-dark/80 to-transparent p-8 z-20">
