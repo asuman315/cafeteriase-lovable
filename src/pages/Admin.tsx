@@ -1,10 +1,10 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Coffee, Utensils, Cake, Star, ImagePlus, ArrowLeft, Save, X, Plus } from "lucide-react";
+import { Coffee, Utensils, Cake, Star, ArrowLeft, Save, X, Plus, Image, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 import { Button } from "@/components/ui/button";
@@ -27,7 +27,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 // Product form schema
 const productSchema = z.object({
@@ -46,7 +45,7 @@ const productSchema = z.object({
   currency: z.enum(["USD", "UGX"], {
     required_error: "Please select a currency.",
   }),
-  images: z.array(z.string().url({ message: "Please enter a valid image URL." }))
+  images: z.array(z.instanceof(File).or(z.string()))
     .min(1, { message: "At least one image is required" })
     .max(3, { message: "Maximum of 3 images allowed" }),
   featured: z.boolean().default(false),
@@ -59,6 +58,8 @@ const Admin = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [imagePreviewIndex, setImagePreviewIndex] = useState(0);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   // Default form values
   const defaultValues: Partial<ProductFormValues> = {
@@ -67,7 +68,7 @@ const Admin = () => {
     price: 0,
     category: "Coffee",
     currency: "USD",
-    images: [""],
+    images: [],
     featured: false,
   };
 
@@ -82,7 +83,7 @@ const Admin = () => {
     setIsLoading(true);
     
     try {
-      // In a real app, you would send this to your API/backend
+      // In a real app, you would upload the images and send data to your API/backend
       console.log("Product data:", data);
       
       // For demo purposes, we'll just show a success toast
@@ -91,8 +92,9 @@ const Admin = () => {
         description: `${data.name} has been added to the ${data.category} category.`,
       });
       
-      // Reset form
+      // Reset form and previews
       form.reset(defaultValues);
+      setImagePreviews([]);
       setImagePreviewIndex(0);
     } catch (error) {
       console.error("Error creating product:", error);
@@ -134,27 +136,53 @@ const Admin = () => {
     }
   };
 
-  // Add image field
-  const addImageField = () => {
-    const currentImages = form.getValues("images") || [];
-    if (currentImages.length < 3) {
-      form.setValue("images", [...currentImages, ""]);
+  // Handle file input change
+  const handleFileChange = (index: number, files: FileList | null) => {
+    if (files && files.length > 0) {
+      const file = files[0];
+      
+      // Update form state with the file
+      const currentImages = [...form.getValues("images")];
+      currentImages[index] = file;
+      form.setValue("images", currentImages);
+      
+      // Create and update preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const newPreviews = [...imagePreviews];
+        newPreviews[index] = e.target?.result as string;
+        setImagePreviews(newPreviews);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  // Remove image field
-  const removeImageField = (index: number) => {
+  // Add image upload slot
+  const addImageUpload = () => {
+    const currentImages = form.getValues("images") || [];
+    if (currentImages.length < 3) {
+      form.setValue("images", [...currentImages, ""]);
+      setImagePreviews([...imagePreviews, ""]);
+    }
+  };
+
+  // Remove image upload slot
+  const removeImageUpload = (index: number) => {
     const currentImages = form.getValues("images") || [];
     if (currentImages.length > 1) {
       const newImages = currentImages.filter((_, i) => i !== index);
       form.setValue("images", newImages);
-      if (imagePreviewIndex >= newImages.length) {
-        setImagePreviewIndex(newImages.length - 1);
+      
+      const newPreviews = imagePreviews.filter((_, i) => i !== index);
+      setImagePreviews(newPreviews);
+      
+      if (imagePreviewIndex >= newPreviews.length) {
+        setImagePreviewIndex(newPreviews.length - 1);
       }
     }
   };
 
-  // Get the current images
+  // Get the current images count
   const watchImages = form.watch("images") || [];
   
   // Get the current currency
@@ -307,38 +335,53 @@ const Admin = () => {
                 <div>
                   <FormLabel>Product Images (Max 3)</FormLabel>
                   <FormDescription className="mb-2">
-                    Enter URLs for your product images
+                    Upload images of your product (JPG, PNG)
                   </FormDescription>
                   
                   {watchImages.map((_, index) => (
-                    <FormField
-                      key={index}
-                      control={form.control}
-                      name={`images.${index}`}
-                      render={({ field }) => (
-                        <FormItem className="mb-2">
-                          <div className="flex items-center gap-2">
-                            <FormControl>
-                              <Input 
-                                placeholder="https://example.com/image.jpg" 
-                                {...field}
-                              />
-                            </FormControl>
-                            {watchImages.length > 1 && (
-                              <Button 
-                                type="button" 
-                                variant="ghost" 
-                                size="icon"
-                                onClick={() => removeImageField(index)}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
-                          <FormMessage />
-                        </FormItem>
+                    <div key={index} className="mb-4 border rounded-md p-4">
+                      <div className="flex items-center gap-4 mb-2">
+                        <div className="flex-1">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            id={`image-${index}`}
+                            className="hidden"
+                            onChange={(e) => handleFileChange(index, e.target.files)}
+                            ref={(el) => (fileInputRefs.current[index] = el)}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => fileInputRefs.current[index]?.click()}
+                            className="w-full"
+                          >
+                            <Image className="mr-2 h-4 w-4" />
+                            {imagePreviews[index] ? 'Change Image' : 'Select Image'}
+                          </Button>
+                        </div>
+                        {watchImages.length > 1 && (
+                          <Button 
+                            type="button" 
+                            variant="destructive" 
+                            size="icon"
+                            onClick={() => removeImageUpload(index)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                      
+                      {imagePreviews[index] && (
+                        <div className="mt-2 relative aspect-video w-full overflow-hidden rounded-md border bg-muted">
+                          <img 
+                            src={imagePreviews[index]} 
+                            alt={`Preview ${index + 1}`}
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
                       )}
-                    />
+                    </div>
                   ))}
                   
                   {watchImages.length < 3 && (
@@ -347,7 +390,7 @@ const Admin = () => {
                       variant="outline"
                       size="sm"
                       className="mt-2"
-                      onClick={addImageField}
+                      onClick={addImageUpload}
                     >
                       <Plus className="mr-2 h-4 w-4" />
                       Add Another Image
@@ -396,39 +439,38 @@ const Admin = () => {
           <div className="rounded-lg border p-6 shadow-sm">
             <h2 className="mb-4 text-xl font-semibold">Preview</h2>
             
-            {watchImages.length > 0 ? (
+            {imagePreviews.length > 0 && imagePreviews[imagePreviewIndex] ? (
               <div>
                 <div className="mb-4 overflow-hidden rounded-lg">
                   <img
-                    src={watchImages[imagePreviewIndex] || "/placeholder.svg"}
+                    src={imagePreviews[imagePreviewIndex]}
                     alt="Product preview"
                     className="h-64 w-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = "/placeholder.svg";
-                    }}
                   />
                 </div>
                 
-                {watchImages.length > 1 && (
+                {imagePreviews.length > 1 && (
                   <div className="mb-4 flex gap-2 justify-center">
-                    {watchImages.map((img, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => setImagePreviewIndex(idx)}
-                        className={`h-2 w-2 rounded-full ${
-                          imagePreviewIndex === idx 
-                            ? "bg-cafePurple" 
-                            : "bg-gray-300"
-                        }`}
-                        aria-label={`View image ${idx + 1}`}
-                      />
+                    {imagePreviews.map((img, idx) => (
+                      img && (
+                        <button
+                          key={idx}
+                          onClick={() => setImagePreviewIndex(idx)}
+                          className={`h-2 w-2 rounded-full ${
+                            imagePreviewIndex === idx 
+                              ? "bg-cafePurple" 
+                              : "bg-gray-300"
+                          }`}
+                          aria-label={`View image ${idx + 1}`}
+                        />
+                      )
                     ))}
                   </div>
                 )}
               </div>
             ) : (
               <div className="mb-4 flex h-64 items-center justify-center rounded-lg bg-muted">
-                <ImagePlus className="h-12 w-12 text-muted-foreground/50" />
+                <Image className="h-12 w-12 text-muted-foreground/50" />
               </div>
             )}
 
