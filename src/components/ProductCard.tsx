@@ -39,6 +39,12 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
     return `${getCurrencySymbol(currency)} ${price.toFixed(currency === "UGX" ? 0 : 2)}`;
   };
   
+  // Strip HTML tags from description to convert rich text to plain text
+  const stripRichText = (text: string | null) => {
+    if (!text) return "";
+    return text.replace(/<[^>]*>/g, '');
+  };
+  
   // Handle adding product to cart
   const handleAddToCart = () => {
     setIsAddingToCart(true);
@@ -92,7 +98,7 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
         </div>
         
         <p className="text-muted-foreground text-sm mb-4 line-clamp-2 flex-grow">
-          {product.description}
+          {stripRichText(product.description)}
         </p>
         
         <Button 
