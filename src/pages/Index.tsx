@@ -7,6 +7,7 @@ import AboutSection from "@/components/AboutSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import Cart from "@/components/Cart";
+import AdminCreateButton from "@/components/AdminCreateButton";
 import { MenuItem, CartItem, MenuCategory } from "@/types";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -241,6 +242,8 @@ const Index = () => {
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
       />
+      
+      <AdminCreateButton />
     </div>
   );
 };
