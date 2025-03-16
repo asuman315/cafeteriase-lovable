@@ -1,13 +1,9 @@
 
+# project_id is needed to deploy edge functions
 project_id = "ypedypnxcsikqvzjqcvy"
 
-[api]
-enabled = true
-port = 54321
-schemas = ["public", "storage"]
-extra_search_path = ["extensions"]
-max_rows = 1000
-
-[functions]
 [functions.send-order-confirmation]
+verify_jwt = false
+
+[functions.create-checkout-session]
 verify_jwt = false

@@ -1,16 +1,18 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/hooks/use-cart";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency } from "@/lib/utils";
-import { CreditCard, Truck, ArrowRight, CheckCircle2 } from "lucide-react";
+import { CreditCard, Truck, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import ShippingForm from "@/components/ShippingForm";
 import OrderSummary from "@/components/OrderSummary";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import DeliveryPreferencesForm from "@/components/DeliveryPreferencesForm";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 enum CheckoutStep {
   SELECT_METHOD,
@@ -31,7 +33,76 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const [shippingInfo, setShippingInfo] = useState<any>(null);
   const [deliveryPreferences, setDeliveryPreferences] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { user, isLoading: authLoading } = useAuth();
+
+  // If not authenticated, redirect to auth page
+  useEffect(() => {
+    if (!authLoading && !user) {
+      toast.error("Please sign in to proceed with checkout");
+      navigate("/auth", { state: { returnTo: "/checkout" } });
+    }
+  }, [user, authLoading, navigate]);
+
+  // Helper function to create Stripe checkout session
+  const createStripeCheckoutSession = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Build success and cancel URLs
+      const successUrl = `${window.location.origin}/checkout?success=true`;
+      const cancelUrl = `${window.location.origin}/checkout?canceled=true`;
+
+      const { data, error } = await supabase.functions.invoke("create-checkout-session", {
+        body: {
+          items: cartItems,
+          customerEmail: user?.email,
+          successUrl,
+          cancelUrl,
+        },
+      });
+
+      if (error) {
+        throw new Error(error.message || "Failed to create checkout session");
+      }
+
+      if (data?.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+      } else {
+        throw new Error("Failed to create checkout session");
+      }
+    } catch (error: any) {
+      console.error("Error creating checkout session:", error);
+      toast.error("Failed to process payment", {
+        description: error.message || "Please try again or contact support",
+      });
+      setIsLoading(false);
+    }
+  };
+
+  // Check for URL parameters on return from Stripe
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get("success");
+    const canceled = urlParams.get("canceled");
+
+    if (success === "true") {
+      setStep(CheckoutStep.CONFIRMATION);
+      clearCart();
+      // Remove query parameters
+      window.history.replaceState({}, document.title, "/checkout");
+    } else if (canceled === "true") {
+      toast.error("Payment was canceled", {
+        description: "You can try again or choose a different payment method",
+      });
+      setPaymentMethod(null);
+      setStep(CheckoutStep.SELECT_METHOD);
+      // Remove query parameters
+      window.history.replaceState({}, document.title, "/checkout");
+    }
+  }, [clearCart]);
 
   // Helper function to handle payment method selection
   const handleSelectPaymentMethod = (method: PaymentMethod) => {
@@ -40,16 +111,8 @@ const Checkout = () => {
       // Skip the delivery preferences step and go directly to shipping info
       setStep(CheckoutStep.SHIPPING_INFO);
     } else {
-      // Simulate Stripe checkout process
-      toast.info("Redirecting to Stripe...", {
-        duration: 2000,
-      });
-      
-      // For demo purposes, we'll just show a success message after a delay
-      setTimeout(() => {
-        setStep(CheckoutStep.CONFIRMATION);
-        clearCart();
-      }, 2000);
+      // Start Stripe checkout process
+      createStripeCheckoutSession();
     }
   };
 
@@ -78,6 +141,18 @@ const Checkout = () => {
           <h1 className="text-3xl font-bold mb-4">Your cart is empty</h1>
           <p className="text-muted-foreground mb-8">Add some items to your cart before proceeding to checkout.</p>
           <Button onClick={() => navigate("/products")}>Browse Products</Button>
+        </div>
+      </div>
+    );
+  }
+
+  // If still loading auth, show loading state
+  if (authLoading) {
+    return (
+      <div className="container mx-auto px-4 py-12 max-w-4xl">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading...</p>
         </div>
       </div>
     );
@@ -140,9 +215,22 @@ const Checkout = () => {
                   </p>
                 </CardContent>
                 <CardFooter>
-                  <Button onClick={() => handleSelectPaymentMethod(PaymentMethod.STRIPE)} className="w-full">
-                    <span>Continue</span>
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                  <Button 
+                    onClick={() => handleSelectPaymentMethod(PaymentMethod.STRIPE)} 
+                    className="w-full"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Continue</span>
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </>
+                    )}
                   </Button>
                 </CardFooter>
               </Card>
