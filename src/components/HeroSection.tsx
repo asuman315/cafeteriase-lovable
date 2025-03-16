@@ -43,14 +43,12 @@ const HeroSection = () => {
             </div>
           </div>
           
-          <div className="hidden md:block w-1/2 relative">
-            <div className="absolute top-0 right-0 w-full h-full">
-              <img 
-                src="/lovable-uploads/3d98dbd5-f125-4671-9bc2-ad8e0d6c0577.png" 
-                alt="English breakfast with eggs, toast, mushrooms, beans and tomatoes" 
-                className="max-w-sm mx-auto animate-float"
-              />
-            </div>
+          <div className="hidden md:flex w-1/2 items-center justify-center">
+            <img 
+              src="/lovable-uploads/3d98dbd5-f125-4671-9bc2-ad8e0d6c0577.png" 
+              alt="English breakfast with eggs, toast, mushrooms, beans and tomatoes" 
+              className="max-w-[450px] w-full mx-auto animate-float"
+            />
           </div>
         </div>
       </div>
