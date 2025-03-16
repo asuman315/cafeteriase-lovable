@@ -52,7 +52,7 @@ const Checkout = () => {
   // Helper function to handle form submission for shipping info
   const handleShippingInfoSubmit = (values: any) => {
     setShippingInfo(values);
-    toast.success("Delivery information saved!", {
+    toast.success("Order placed successfully!", {
       duration: 2000,
     });
     setStep(CheckoutStep.CONFIRMATION);

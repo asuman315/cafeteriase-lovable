@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { X, Plus, Minus, ShoppingBag } from "lucide-react";
@@ -43,6 +42,14 @@ const Cart = ({
   const handleCheckout = () => {
     handleClose();
     navigate('/checkout');
+  };
+
+  const formatPrice = (price: number, currency = "USD") => {
+    const currencySymbol = currency === "USD" ? "$" : 
+                           currency === "EUR" ? "€" : 
+                           currency === "GBP" ? "£" : "$";
+                           
+    return `${currencySymbol}${price.toFixed(2)}`;
   };
 
   if (!isOpen && !isClosing) return null;

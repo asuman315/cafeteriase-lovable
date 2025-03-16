@@ -2,9 +2,9 @@
 import { useState, useEffect } from "react";
 import { X, ShoppingBag, Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import { useCart } from "@/hooks/use-cart";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 
 interface ShoppingCartProps {
@@ -26,15 +26,6 @@ const ShoppingCart = ({ isOpen, onClose }: ShoppingCartProps) => {
   const handleClose = () => {
     setIsClosing(true);
     setTimeout(() => onClose(), 300);
-  };
-
-  // Format price based on currency
-  const formatPrice = (price: number, currency = "USD") => {
-    const currencySymbol = currency === "USD" ? "$" : 
-                           currency === "EUR" ? "€" : 
-                           currency === "GBP" ? "£" : "$";
-                           
-    return `${currencySymbol}${price.toFixed(2)}`;
   };
 
   // Handle checkout
@@ -98,7 +89,7 @@ const ShoppingCart = ({ isOpen, onClose }: ShoppingCartProps) => {
                     <div className="ml-4 flex flex-1 flex-col">
                       <div className="flex justify-between text-base font-medium">
                         <h3 className="line-clamp-1">{item.name}</h3>
-                        <p className="ml-4">{formatPrice(item.price * item.quantity, item.currency)}</p>
+                        <p className="ml-4">{formatCurrency(item.price * item.quantity, item.currency)}</p>
                       </div>
                       <p className="mt-1 text-sm text-gray-500 line-clamp-1">{item.description && typeof item.description === 'string' ? 
                         item.description.replace(/<[^>]*>/g, '') : ''}</p>
@@ -143,7 +134,7 @@ const ShoppingCart = ({ isOpen, onClose }: ShoppingCartProps) => {
             <div className="border-t border-gray-200 p-6">
               <div className="flex justify-between text-base font-medium mb-4">
                 <p>Subtotal</p>
-                <p>{formatPrice(totalPrice)}</p>
+                <p>{formatCurrency(totalPrice)}</p>
               </div>
               <Button className="w-full bg-cafePurple hover:bg-cafePurple-dark" onClick={handleCheckout}>
                 Checkout

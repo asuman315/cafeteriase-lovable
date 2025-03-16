@@ -14,11 +14,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
+import { sendOrderConfirmationEmail } from "@/lib/utils";
+import { useCart } from "@/hooks/use-cart";
 
 // Create a schema for form validation
 const formSchema = z.object({
   fullName: z.string().min(3, { message: "Full name must be at least 3 characters." }),
+  email: z.string().email({ message: "Please enter a valid email address." }),
   address: z.string().min(5, { message: "Address must be at least 5 characters." }),
   city: z.string().min(2, { message: "City must be at least 2 characters." }),
   zipCode: z.string().min(4, { message: "Zip code must be at least 4 characters." }),
@@ -36,12 +40,14 @@ interface ShippingFormProps {
 
 const ShippingForm = ({ onSubmit }: ShippingFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { cartItems, totalPrice } = useCart();
 
   // Initialize the form
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       fullName: "",
+      email: "",
       address: "",
       city: "",
       zipCode: "",
@@ -51,14 +57,41 @@ const ShippingForm = ({ onSubmit }: ShippingFormProps) => {
   });
 
   // Handle form submission
-  const handleSubmit = (values: FormValues) => {
+  const handleSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
     
-    // Simulate API call delay
-    setTimeout(() => {
+    try {
+      // Send order confirmation email
+      await sendOrderConfirmationEmail(
+        values.email,
+        {
+          fullName: values.fullName,
+          address: values.address,
+          city: values.city,
+          zipCode: values.zipCode,
+          phone: values.phone,
+          notes: values.notes,
+        },
+        cartItems,
+        totalPrice
+      );
+      
+      toast.success("Order confirmation email sent!", {
+        description: "Check your email for details.",
+        duration: 3000,
+      });
+      
+      // Complete the checkout process
       onSubmit(values);
+    } catch (error) {
+      console.error("Failed to send order confirmation:", error);
+      toast.error("There was a problem processing your order", {
+        description: "Please try again or contact support.",
+        duration: 5000,
+      });
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -77,6 +110,20 @@ const ShippingForm = ({ onSubmit }: ShippingFormProps) => {
                   <FormLabel>Full Name</FormLabel>
                   <FormControl>
                     <Input placeholder="John Doe" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input type="email" placeholder="john.doe@example.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

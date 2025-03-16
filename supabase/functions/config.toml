@@ -1,0 +1,8 @@
+
+project_id = "cafe-ecommerce"
+
+[global.build]
+command = ""
+
+[[global.env]]
+name = "RESEND_API_KEY"
