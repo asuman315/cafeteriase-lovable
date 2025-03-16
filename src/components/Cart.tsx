@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { X, Plus, Minus, ShoppingBag } from "lucide-react";
@@ -107,7 +108,7 @@ const Cart = ({
                     <div className="ml-4 flex flex-1 flex-col">
                       <div className="flex justify-between text-base font-medium">
                         <h3>{item.name}</h3>
-                        <p className="ml-4">${(item.price * item.quantity).toFixed(2)}</p>
+                        <p className="ml-4">{formatPrice(item.price * item.quantity)}</p>
                       </div>
                       <p className="mt-1 text-sm text-gray-500">{item.description}</p>
 
@@ -151,7 +152,7 @@ const Cart = ({
             <div className="border-t border-gray-200 p-6">
               <div className="flex justify-between text-base font-medium mb-4">
                 <p>Subtotal</p>
-                <p>${subtotal.toFixed(2)}</p>
+                <p>{formatPrice(subtotal)}</p>
               </div>
               <Button className="w-full bg-cafePurple hover:bg-cafePurple-dark" onClick={handleCheckout}>
                 Checkout
