@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -68,7 +67,7 @@ const Admin = () => {
   const defaultValues: Partial<ProductFormValues> = {
     name: "",
     description: "",
-    price: 0,
+    price: undefined,
     category: "Coffee",
     currency: "USD",
     images: [],
@@ -230,11 +229,19 @@ const Admin = () => {
   // Get the current currency
   const watchCurrency = form.watch("currency") || "USD";
 
-  // Handle price change to prevent form submission
+  // Handle price change to prevent form submission and handle empty value
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
-    // Let the form handle the value through the Controller
-    form.setValue("price", parseFloat(e.target.value) || 0);
+    
+    // Handle empty input or just the initial 0
+    const inputValue = e.target.value;
+    if (inputValue === '' || inputValue === '0') {
+      form.setValue("price", undefined);
+      return;
+    }
+    
+    // Otherwise set the parsed value
+    form.setValue("price", parseFloat(inputValue) || 0);
   };
 
   return (
@@ -307,7 +314,7 @@ const Admin = () => {
                             placeholder="0.00" 
                             step="0.01"
                             onChange={handlePriceChange}
-                            value={field.value}
+                            value={field.value === undefined ? '' : field.value}
                             onBlur={field.onBlur}
                             name={field.name}
                           />
@@ -560,8 +567,8 @@ const Admin = () => {
 
               <p className="font-semibold text-cafePurple">
                 {getCurrencySymbol(watchCurrency)}{" "}
-                {typeof form.watch("price") === 'number' 
-                  ? form.watch("price").toFixed(watchCurrency === "UGX" ? 0 : 2) 
+                {form.watch("price") !== undefined
+                  ? Number(form.watch("price")).toFixed(watchCurrency === "UGX" ? 0 : 2)
                   : '0.00'}
               </p>
             </div>
