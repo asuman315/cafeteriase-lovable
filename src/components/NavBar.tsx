@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import UserMenu from "@/components/UserMenu";
+import { Link } from "react-router-dom";
 
 interface NavBarProps {
   onCartClick: () => void;
@@ -86,12 +88,16 @@ const NavBar = ({ onCartClick, cartItemCount }: NavBarProps) => {
               )}
             </Button>
             
-            <Button className={cn(
-              "ml-4",
-              isScrolled
-                ? "bg-cafePurple hover:bg-cafePurple-dark text-white"
-                : "bg-white text-cafePurple hover:bg-white/90"
-            )}>
+            <UserMenu isScrolled={isScrolled} />
+            
+            <Button 
+              className={cn(
+                "ml-4",
+                isScrolled
+                  ? "bg-cafePurple hover:bg-cafePurple-dark text-white"
+                  : "bg-white text-cafePurple hover:bg-white/90"
+              )}
+            >
               Order Now
             </Button>
           </div>
@@ -114,6 +120,8 @@ const NavBar = ({ onCartClick, cartItemCount }: NavBarProps) => {
                 </span>
               )}
             </Button>
+            
+            <UserMenu isScrolled={isScrolled} />
             
             <Button
               variant="ghost"
