@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -31,10 +30,10 @@ const HeroSection = () => {
   };
   
   return (
-    <section id="home" className="relative h-[85vh] flex items-center justify-center overflow-hidden">
+    <section id="home" className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-cafePurple-dark">
       {/* Background image with animation */}
       <div className="absolute inset-0 w-full h-full">
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" initial={false}>
           {images.map((image, index) => (
             index === currentImageIndex && (
               <motion.div
@@ -45,12 +44,7 @@ const HeroSection = () => {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 1.2, ease: "easeInOut" }}
               >
-                <motion.div 
-                  className="absolute inset-0 bg-gradient-to-b from-cafePurple-dark/50 via-cafePurple/40 to-cafePurple/60"
-                  initial={{ opacity: 0.5 }}
-                  animate={{ opacity: 0.7 }}
-                  transition={{ duration: 1.5 }}
-                />
+                <div className="absolute inset-0 bg-gradient-to-b from-cafePurple-dark/50 via-cafePurple/40 to-cafePurple/60 z-10" />
                 <img
                   src={image}
                   alt="Hero background"
