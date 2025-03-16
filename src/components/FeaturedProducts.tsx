@@ -7,6 +7,7 @@ import { type Product } from "@/types";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { ChevronRight } from "lucide-react";
 
 const FeaturedProducts = () => {
   const { data: featuredProducts, isLoading } = useQuery({
@@ -16,7 +17,7 @@ const FeaturedProducts = () => {
         .from('cafe_products')
         .select('*')
         .eq('featured', true)
-        .limit(3);
+        .limit(6);
         
       if (error) throw error;
       
@@ -74,7 +75,10 @@ const FeaturedProducts = () => {
         
         <div className="mt-12 text-center">
           <Button asChild className="bg-cafePurple hover:bg-cafePurple-dark text-white px-8">
-            <Link to="/products">View All Products</Link>
+            <Link to="/products">
+              View All Products
+              <ChevronRight className="ml-2 h-4 w-4" />
+            </Link>
           </Button>
         </div>
       </div>
