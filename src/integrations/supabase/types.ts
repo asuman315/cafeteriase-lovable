@@ -9,7 +9,7 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      cart_items: {
+      cafe_cart_items: {
         Row: {
           created_at: string
           id: string
@@ -36,15 +36,15 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "cart_items_product_id_fkey"
+            foreignKeyName: "cafe_cart_items_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: "products"
+            referencedRelation: "cafe_products"
             referencedColumns: ["id"]
           },
         ]
       }
-      order_items: {
+      cafe_order_items: {
         Row: {
           created_at: string
           id: string
@@ -71,22 +71,22 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "order_items_order_id_fkey"
+            foreignKeyName: "cafe_order_items_order_id_fkey"
             columns: ["order_id"]
             isOneToOne: false
-            referencedRelation: "orders"
+            referencedRelation: "cafe_orders"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "order_items_product_id_fkey"
+            foreignKeyName: "cafe_order_items_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: "products"
+            referencedRelation: "cafe_products"
             referencedColumns: ["id"]
           },
         ]
       }
-      orders: {
+      cafe_orders: {
         Row: {
           created_at: string
           id: string
@@ -116,7 +116,7 @@ export type Database = {
         }
         Relationships: []
       }
-      products: {
+      cafe_products: {
         Row: {
           created_at: string
           description: string | null
@@ -146,7 +146,7 @@ export type Database = {
         }
         Relationships: []
       }
-      profiles: {
+      cafe_profiles: {
         Row: {
           created_at: string
           id: string
