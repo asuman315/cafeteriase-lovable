@@ -124,27 +124,38 @@ const handler = async (req: Request): Promise<Response> => {
       </div>
     `;
 
-    // Send the email
-    const emailResponse = await resend.emails.send({
-      from: "Orders <onboarding@resend.dev>",
-      to: [orderDetails.email, "asumanssendegeya@gmail.com"], // Send to customer and shop owner
-      subject: "Your Order Confirmation",
-      html: htmlContent,
-    });
+    try {
+      // Send the email
+      const emailResponse = await resend.emails.send({
+        from: "Orders <onboarding@resend.dev>",
+        to: [orderDetails.email, "asumanssendegeya@gmail.com"], // Send to customer and shop owner
+        subject: "Your Order Confirmation",
+        html: htmlContent,
+      });
 
-    console.log("Email sent successfully:", emailResponse);
+      console.log("Email sent successfully:", emailResponse);
 
-    return new Response(JSON.stringify(emailResponse), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
-    });
+      return new Response(JSON.stringify({ success: true, data: emailResponse }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          ...corsHeaders,
+        },
+      });
+    } catch (emailError: any) {
+      console.error("Error sending email:", emailError);
+      return new Response(
+        JSON.stringify({ success: false, error: emailError.message || "Failed to send email" }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
   } catch (error: any) {
     console.error("Error in send-order-confirmation function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ success: false, error: error.message || "Unknown error" }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

@@ -83,12 +83,18 @@ const ShippingForm = ({ onSubmit }: ShippingFormProps) => {
       
       // Complete the checkout process
       onSubmit(values);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to send order confirmation:", error);
+      
+      // More user-friendly error message
       toast.error("There was a problem processing your order", {
-        description: "Please try again or contact support.",
+        description: error.message || "Please try again or contact support.",
         duration: 5000,
       });
+      
+      // Still proceed with checkout even if email fails
+      // This is a business decision - you might want to not proceed if email is critical
+      onSubmit(values);
     } finally {
       setIsSubmitting(false);
     }
