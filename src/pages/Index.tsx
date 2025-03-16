@@ -22,7 +22,8 @@ const menuCategories: MenuCategory[] = [
         description: "Smashed avocado on artisan sourdough with cherry tomatoes and microgreens",
         price: 12.99,
         image: "https://images.unsplash.com/photo-1588137378633-dea1336ce1e2?q=80&w=500&auto=format&fit=crop",
-        category: "Breakfast"
+        category: "Breakfast",
+        featured: true
       },
       {
         id: 102,
@@ -30,7 +31,8 @@ const menuCategories: MenuCategory[] = [
         description: "Poached eggs on English muffin with hollandaise sauce and your choice of protein",
         price: 14.99,
         image: "https://images.unsplash.com/photo-1608039829572-78524f79c4c7?q=80&w=500&auto=format&fit=crop",
-        category: "Breakfast"
+        category: "Breakfast",
+        featured: false
       },
       {
         id: 103,
@@ -38,7 +40,8 @@ const menuCategories: MenuCategory[] = [
         description: "Greek yogurt with fresh berries, house granola, and local honey",
         price: 9.99,
         image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?q=80&w=500&auto=format&fit=crop",
-        category: "Breakfast"
+        category: "Breakfast",
+        featured: false
       }
     ]
   },
@@ -52,7 +55,8 @@ const menuCategories: MenuCategory[] = [
         description: "Double espresso with steamed milk foam",
         price: 4.99,
         image: "https://images.unsplash.com/photo-1534778101976-62847782c213?q=80&w=500&auto=format&fit=crop",
-        category: "Coffee"
+        category: "Coffee",
+        featured: true
       },
       {
         id: 202,
@@ -60,7 +64,8 @@ const menuCategories: MenuCategory[] = [
         description: "Hand-poured single origin coffee with complex notes",
         price: 5.49,
         image: "https://images.unsplash.com/photo-1497935586047-9395ee065474?q=80&w=500&auto=format&fit=crop",
-        category: "Coffee"
+        category: "Coffee",
+        featured: false
       },
       {
         id: 203,
@@ -68,7 +73,8 @@ const menuCategories: MenuCategory[] = [
         description: "Espresso with vanilla, caramel and steamed milk",
         price: 5.99,
         image: "https://images.unsplash.com/photo-1587080413959-06b859fb107d?q=80&w=500&auto=format&fit=crop",
-        category: "Coffee"
+        category: "Coffee",
+        featured: false
       }
     ]
   },
@@ -82,7 +88,8 @@ const menuCategories: MenuCategory[] = [
         description: "Organic quinoa with roasted vegetables, avocado, and tahini dressing",
         price: 13.99,
         image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=500&auto=format&fit=crop",
-        category: "Lunch"
+        category: "Lunch",
+        featured: true
       },
       {
         id: 302,
@@ -90,7 +97,8 @@ const menuCategories: MenuCategory[] = [
         description: "Grilled chicken with avocado, bacon, and herb aioli on artisan bread",
         price: 15.99,
         image: "https://images.unsplash.com/photo-1603046891744-76e7d732555c?q=80&w=500&auto=format&fit=crop",
-        category: "Lunch"
+        category: "Lunch",
+        featured: false
       },
       {
         id: 303,
@@ -98,7 +106,8 @@ const menuCategories: MenuCategory[] = [
         description: "House-made soup with local seasonal ingredients",
         price: 8.99,
         image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=500&auto=format&fit=crop",
-        category: "Lunch"
+        category: "Lunch",
+        featured: false
       }
     ]
   },
@@ -112,7 +121,8 @@ const menuCategories: MenuCategory[] = [
         description: "Classic Italian dessert with espresso, mascarpone, and cocoa",
         price: 7.99,
         image: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?q=80&w=500&auto=format&fit=crop",
-        category: "Desserts"
+        category: "Desserts",
+        featured: true
       },
       {
         id: 402,
@@ -120,7 +130,8 @@ const menuCategories: MenuCategory[] = [
         description: "Rich chocolate cake with ganache and fresh berries",
         price: 8.49,
         image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=500&auto=format&fit=crop",
-        category: "Desserts"
+        category: "Desserts",
+        featured: false
       },
       {
         id: 403,
@@ -128,7 +139,8 @@ const menuCategories: MenuCategory[] = [
         description: "Assorted French macarons in seasonal flavors",
         price: 10.99,
         image: "https://images.unsplash.com/photo-1558326567-98ae2405596b?q=80&w=500&auto=format&fit=crop",
-        category: "Desserts"
+        category: "Desserts",
+        featured: false
       }
     ]
   }

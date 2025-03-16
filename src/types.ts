@@ -6,6 +6,7 @@ export interface MenuItem {
   price: number;
   image: string;
   category: string;
+  featured: boolean;
 }
 
 export interface MenuCategory {

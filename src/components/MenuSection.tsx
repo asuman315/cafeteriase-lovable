@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MenuCategory, MenuItem } from "@/types";
-import { Plus } from "lucide-react";
+import { Plus, Star } from "lucide-react";
 
 interface MenuSectionProps {
   categories: MenuCategory[];
@@ -51,12 +51,17 @@ const MenuSection = ({ categories, onAddToCart }: MenuSectionProps) => {
                 className="menu-card animate-fade-in"
                 style={{ animationDelay: `${item.id * 0.1}s` }}
               >
-                <div className="h-48 overflow-hidden">
+                <div className="h-48 overflow-hidden relative">
                   <img
                     src={item.image}
                     alt={item.name}
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
                   />
+                  {item.featured && (
+                    <div className="absolute top-2 right-2 bg-cafePurple text-white p-1 rounded-full">
+                      <Star className="h-4 w-4" />
+                    </div>
+                  )}
                 </div>
                 <div className="p-5">
                   <div className="flex justify-between items-start mb-2">
