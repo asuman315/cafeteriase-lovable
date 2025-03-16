@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { Coffee, Utensils, Cake, Star, ArrowLeft, Save, X, Plus, Image, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,7 +44,7 @@ const productSchema = z.object({
   category: z.enum(["Breakfast", "Coffee", "Lunch", "Desserts"], {
     required_error: "Please select a category.",
   }),
-  currency: z.enum(["USD", "UGX"], {
+  currency: z.enum(["USD", "UGX", "EUR", "GBP", "CAD", "AUD"], {
     required_error: "Please select a currency.",
   }),
   images: z.array(z.instanceof(File).or(z.string()))
@@ -60,6 +62,7 @@ const Admin = () => {
   const [imagePreviewIndex, setImagePreviewIndex] = useState(0);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [editorContent, setEditorContent] = useState('');
 
   // Default form values
   const defaultValues: Partial<ProductFormValues> = {
@@ -96,6 +99,7 @@ const Admin = () => {
       form.reset(defaultValues);
       setImagePreviews([]);
       setImagePreviewIndex(0);
+      setEditorContent('');
     } catch (error) {
       console.error("Error creating product:", error);
       toast({
@@ -106,6 +110,30 @@ const Admin = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Quill editor modules and formats
+  const quillModules = {
+    toolbar: [
+      [{ 'header': [1, 2, false] }],
+      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+      [{'list': 'ordered'}, {'list': 'bullet'}],
+      ['link'],
+      ['clean']
+    ],
+  };
+  
+  const quillFormats = [
+    'header',
+    'bold', 'italic', 'underline', 'strike', 'blockquote',
+    'list', 'bullet',
+    'link'
+  ];
+
+  // Handle editor content change
+  const handleEditorChange = (content: string) => {
+    setEditorContent(content);
+    form.setValue("description", content, { shouldValidate: true });
   };
 
   // Get category icon based on selection
@@ -131,9 +159,23 @@ const Admin = () => {
         return "$";
       case "UGX":
         return "USh";
+      case "EUR":
+        return "€";
+      case "GBP":
+        return "£";
+      case "CAD":
+        return "C$";
+      case "AUD":
+        return "A$";
       default:
         return "$";
     }
+  };
+
+  // Strip HTML tags from rich text
+  const stripHtml = (html: string) => {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.body.textContent || "";
   };
 
   // Handle file input change
@@ -228,11 +270,17 @@ const Admin = () => {
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          placeholder="Enter product description" 
-                          {...field} 
-                          className="min-h-[100px]"
-                        />
+                        <div className="min-h-[150px]">
+                          <ReactQuill
+                            theme="snow"
+                            modules={quillModules}
+                            formats={quillFormats}
+                            value={editorContent}
+                            onChange={handleEditorChange}
+                            placeholder="Enter product description"
+                            className="h-[120px] mb-12"
+                          />
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -277,6 +325,10 @@ const Admin = () => {
                           <SelectContent>
                             <SelectItem value="USD">US Dollar ($)</SelectItem>
                             <SelectItem value="UGX">Ugandan Shilling (USh)</SelectItem>
+                            <SelectItem value="EUR">Euro (€)</SelectItem>
+                            <SelectItem value="GBP">British Pound (£)</SelectItem>
+                            <SelectItem value="CAD">Canadian Dollar (C$)</SelectItem>
+                            <SelectItem value="AUD">Australian Dollar (A$)</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -493,7 +545,7 @@ const Admin = () => {
               </div>
 
               <p className="text-muted-foreground">
-                {form.watch("description") || "Product description will appear here..."}
+                {form.watch("description") ? stripHtml(form.watch("description")) : "Product description will appear here..."}
               </p>
 
               <p className="font-semibold text-cafePurple">
@@ -513,6 +565,7 @@ const Admin = () => {
               <li>Set competitive prices that reflect the quality of your products</li>
               <li>Upload multiple images to showcase different angles/aspects of your product</li>
               <li>Choose the appropriate currency based on your target market</li>
+              <li>Use rich text formatting to make your descriptions more engaging</li>
             </ul>
           </div>
         </div>
