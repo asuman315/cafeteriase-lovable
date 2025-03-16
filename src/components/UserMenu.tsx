@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { LogOutIcon, LogInIcon } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface UserMenuProps {
   isScrolled?: boolean;
@@ -37,6 +38,20 @@ const UserMenu = ({ isScrolled }: UserMenuProps) => {
     }
   };
 
+  // Get user initials from name or email
+  const getUserInitials = () => {
+    if (user?.user_metadata?.name) {
+      return user.user_metadata.name
+        .split(' ')
+        .map((n: string) => n[0])
+        .join('')
+        .toUpperCase();
+    } else if (user?.email) {
+      return user.email.substring(0, 2).toUpperCase();
+    }
+    return "U";
+  };
+
   if (!user) {
     return (
       <Button
@@ -53,11 +68,11 @@ const UserMenu = ({ isScrolled }: UserMenuProps) => {
 
   return (
     <div className="flex items-center">
-      <div className={`mr-2 ${isScrolled ? "text-gray-700" : "text-white"}`}>
-        <span className="hidden md:inline text-sm">
-          Hello, {user.user_metadata?.name || user.email?.split("@")[0]}
-        </span>
-      </div>
+      <Avatar className="h-8 w-8 mr-2">
+        <AvatarFallback className="bg-cafePurple text-white">
+          {getUserInitials()}
+        </AvatarFallback>
+      </Avatar>
       <Button
         variant="ghost"
         size="sm"
