@@ -9,10 +9,13 @@ interface MenuSectionProps {
   onAddToCart: (item: MenuItem) => void;
 }
 
-// Utility function to convert rich text to plain text
-const stripRichText = (text: string | null) => {
+// Utility function to convert rich text to plain text and truncate
+const stripRichText = (text: string | null, maxLength = 80) => {
   if (!text) return "";
-  return text.replace(/<[^>]*>/g, '');
+  const stripped = text.replace(/<[^>]*>/g, '');
+  return stripped.length > maxLength 
+    ? stripped.substring(0, maxLength) + '...' 
+    : stripped;
 };
 
 const MenuSection = ({ onAddToCart }: MenuSectionProps) => {
@@ -129,7 +132,7 @@ const MenuSection = ({ onAddToCart }: MenuSectionProps) => {
                       <h3 className="font-semibold text-xl">{item.name}</h3>
                       <span className="text-cafePurple font-semibold">${item.price.toFixed(2)}</span>
                     </div>
-                    <p className="text-gray-600 text-sm mb-4">{item.description}</p>
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">{item.description}</p>
                     <Button
                       onClick={() => onAddToCart(item)}
                       className="w-full bg-cafePurple hover:bg-cafePurple-dark"

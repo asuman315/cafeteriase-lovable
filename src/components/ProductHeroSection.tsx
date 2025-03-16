@@ -28,7 +28,7 @@ const ProductHeroSection = () => {
   };
 
   return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+    <section className="relative min-h-[70vh] flex items-center overflow-hidden">
       {/* Background image with animation */}
       <div className="absolute inset-0 w-full h-full">
         {images.map((image, index) => (
@@ -51,46 +51,46 @@ const ProductHeroSection = () => {
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="flex flex-col md:flex-row items-center justify-between">
           <motion.div 
-            className="max-w-xl space-y-6 text-center md:text-left"
+            className="max-w-xl space-y-4 text-center md:text-left"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-3 leading-tight">
               Discover Our<br/>Premium Collection
             </h1>
-            <p className="text-xl text-white/90 mb-8">
+            <p className="text-lg text-white/90 mb-6">
               Experience quality and taste in every sip and bite. Crafted with precision and passion.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
-              <Button onClick={scrollToProducts} className="bg-white text-cafePurple hover:bg-gray-100 px-8 py-6 text-lg">
+              <Button onClick={scrollToProducts} className="bg-white text-cafePurple hover:bg-gray-100 px-6 py-5 text-lg">
                 View Products
               </Button>
-              <Button variant="outline" className="border-white text-white hover:bg-white/10 px-8 py-6 text-lg">
+              <Button variant="outline" className="border-white text-white hover:bg-white/10 px-6 py-5 text-lg">
                 Learn More
               </Button>
             </div>
           </motion.div>
           
           <motion.div 
-            className="hidden md:flex gap-4 mt-10 md:mt-0"
+            className="hidden md:flex gap-4 mt-8 md:mt-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             <div className="flex flex-col gap-4">
-              <div className="glass-morphism w-40 h-40 rounded-2xl flex flex-col items-center justify-center text-white">
-                <Coffee className="w-12 h-12 mb-2" />
+              <div className="glass-morphism w-32 h-32 rounded-2xl flex flex-col items-center justify-center text-white">
+                <Coffee className="w-10 h-10 mb-2" />
                 <span className="font-medium">Coffee</span>
               </div>
-              <div className="glass-morphism w-40 h-40 rounded-2xl flex flex-col items-center justify-center text-white">
-                <Utensils className="w-12 h-12 mb-2" />
+              <div className="glass-morphism w-32 h-32 rounded-2xl flex flex-col items-center justify-center text-white">
+                <Utensils className="w-10 h-10 mb-2" />
                 <span className="font-medium">Food</span>
               </div>
             </div>
-            <div className="mt-10">
-              <div className="glass-morphism w-40 h-40 rounded-2xl flex flex-col items-center justify-center text-white">
-                <Cake className="w-12 h-12 mb-2" />
+            <div className="mt-8">
+              <div className="glass-morphism w-32 h-32 rounded-2xl flex flex-col items-center justify-center text-white">
+                <Cake className="w-10 h-10 mb-2" />
                 <span className="font-medium">Pastries</span>
               </div>
             </div>
@@ -100,9 +100,9 @@ const ProductHeroSection = () => {
       
       <button 
         onClick={scrollToProducts} 
-        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white animate-bounce"
+        className="absolute bottom-6 left-1/2 transform -translate-x-1/2 text-white animate-bounce"
       >
-        <ChevronDown className="h-10 w-10" />
+        <ChevronDown className="h-8 w-8" />
       </button>
     </section>
   );

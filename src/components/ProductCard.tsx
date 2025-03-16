@@ -39,10 +39,13 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
     return `${getCurrencySymbol(currency)} ${price.toFixed(currency === "UGX" ? 0 : 2)}`;
   };
   
-  // Strip HTML tags from description to convert rich text to plain text
-  const stripRichText = (text: string | null) => {
+  // Strip HTML tags from description and truncate text
+  const stripRichText = (text: string | null, maxLength = 80) => {
     if (!text) return "";
-    return text.replace(/<[^>]*>/g, '');
+    const stripped = text.replace(/<[^>]*>/g, '');
+    return stripped.length > maxLength 
+      ? stripped.substring(0, maxLength) + '...' 
+      : stripped;
   };
   
   // Handle adding product to cart
