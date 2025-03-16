@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Coffee, Utensils, Cake, Star, ImagePlus, ArrowLeft, Save } from "lucide-react";
+import { Coffee, Utensils, Cake, Star, ImagePlus, ArrowLeft, Save, X, Plus } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 // Product form schema
 const productSchema = z.object({
@@ -42,7 +43,12 @@ const productSchema = z.object({
   category: z.enum(["Breakfast", "Coffee", "Lunch", "Desserts"], {
     required_error: "Please select a category.",
   }),
-  image: z.string().url({ message: "Please enter a valid image URL." }),
+  currency: z.enum(["USD", "UGX"], {
+    required_error: "Please select a currency.",
+  }),
+  images: z.array(z.string().url({ message: "Please enter a valid image URL." }))
+    .min(1, { message: "At least one image is required" })
+    .max(3, { message: "Maximum of 3 images allowed" }),
   featured: z.boolean().default(false),
 });
 
@@ -52,7 +58,7 @@ const Admin = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [imagePreview, setImagePreview] = useState("");
+  const [imagePreviewIndex, setImagePreviewIndex] = useState(0);
 
   // Default form values
   const defaultValues: Partial<ProductFormValues> = {
@@ -60,7 +66,8 @@ const Admin = () => {
     description: "",
     price: 0,
     category: "Coffee",
-    image: "",
+    currency: "USD",
+    images: [""],
     featured: false,
   };
 
@@ -69,12 +76,6 @@ const Admin = () => {
     resolver: zodResolver(productSchema),
     defaultValues,
   });
-
-  // Watch the image field to update preview
-  const imageUrl = form.watch("image");
-  if (imageUrl && imageUrl !== imagePreview) {
-    setImagePreview(imageUrl);
-  }
 
   // Handle form submission
   const onSubmit = async (data: ProductFormValues) => {
@@ -92,7 +93,7 @@ const Admin = () => {
       
       // Reset form
       form.reset(defaultValues);
-      setImagePreview("");
+      setImagePreviewIndex(0);
     } catch (error) {
       console.error("Error creating product:", error);
       toast({
@@ -120,6 +121,44 @@ const Admin = () => {
         return null;
     }
   };
+
+  // Get currency symbol based on selection
+  const getCurrencySymbol = (currency: string) => {
+    switch (currency) {
+      case "USD":
+        return "$";
+      case "UGX":
+        return "USh";
+      default:
+        return "$";
+    }
+  };
+
+  // Add image field
+  const addImageField = () => {
+    const currentImages = form.getValues("images") || [];
+    if (currentImages.length < 3) {
+      form.setValue("images", [...currentImages, ""]);
+    }
+  };
+
+  // Remove image field
+  const removeImageField = (index: number) => {
+    const currentImages = form.getValues("images") || [];
+    if (currentImages.length > 1) {
+      const newImages = currentImages.filter((_, i) => i !== index);
+      form.setValue("images", newImages);
+      if (imagePreviewIndex >= newImages.length) {
+        setImagePreviewIndex(newImages.length - 1);
+      }
+    }
+  };
+
+  // Get the current images
+  const watchImages = form.watch("images") || [];
+  
+  // Get the current currency
+  const watchCurrency = form.watch("currency") || "USD";
 
   return (
     <div className="container mx-auto px-4 py-10 md:py-16">
@@ -178,7 +217,7 @@ const Admin = () => {
                     name="price"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Price ($)</FormLabel>
+                        <FormLabel>Price</FormLabel>
                         <FormControl>
                           <Input 
                             type="number" 
@@ -194,44 +233,22 @@ const Admin = () => {
 
                   <FormField
                     control={form.control}
-                    name="category"
+                    name="currency"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Category</FormLabel>
+                        <FormLabel>Currency</FormLabel>
                         <Select 
                           onValueChange={field.onChange} 
                           defaultValue={field.value}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select a category" />
+                              <SelectValue placeholder="Select a currency" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="Breakfast">
-                              <div className="flex items-center">
-                                <Utensils className="mr-2 h-4 w-4" />
-                                <span>Breakfast</span>
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="Coffee">
-                              <div className="flex items-center">
-                                <Coffee className="mr-2 h-4 w-4" />
-                                <span>Coffee</span>
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="Lunch">
-                              <div className="flex items-center">
-                                <Utensils className="mr-2 h-4 w-4" />
-                                <span>Lunch</span>
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="Desserts">
-                              <div className="flex items-center">
-                                <Cake className="mr-2 h-4 w-4" />
-                                <span>Desserts</span>
-                              </div>
-                            </SelectItem>
+                            <SelectItem value="USD">US Dollar ($)</SelectItem>
+                            <SelectItem value="UGX">Ugandan Shilling (USh)</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -242,25 +259,101 @@ const Admin = () => {
 
                 <FormField
                   control={form.control}
-                  name="image"
+                  name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Image URL</FormLabel>
-                      <FormControl>
-                        <div className="flex items-center gap-2">
-                          <Input 
-                            placeholder="https://example.com/image.jpg" 
-                            {...field} 
-                          />
-                        </div>
-                      </FormControl>
-                      <FormDescription>
-                        Enter a URL for the product image (or use our image upload in the future)
-                      </FormDescription>
+                      <FormLabel>Category</FormLabel>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a category" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Breakfast">
+                            <div className="flex items-center">
+                              <Utensils className="mr-2 h-4 w-4" />
+                              <span>Breakfast</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="Coffee">
+                            <div className="flex items-center">
+                              <Coffee className="mr-2 h-4 w-4" />
+                              <span>Coffee</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="Lunch">
+                            <div className="flex items-center">
+                              <Utensils className="mr-2 h-4 w-4" />
+                              <span>Lunch</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="Desserts">
+                            <div className="flex items-center">
+                              <Cake className="mr-2 h-4 w-4" />
+                              <span>Desserts</span>
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+
+                <div>
+                  <FormLabel>Product Images (Max 3)</FormLabel>
+                  <FormDescription className="mb-2">
+                    Enter URLs for your product images
+                  </FormDescription>
+                  
+                  {watchImages.map((_, index) => (
+                    <FormField
+                      key={index}
+                      control={form.control}
+                      name={`images.${index}`}
+                      render={({ field }) => (
+                        <FormItem className="mb-2">
+                          <div className="flex items-center gap-2">
+                            <FormControl>
+                              <Input 
+                                placeholder="https://example.com/image.jpg" 
+                                {...field}
+                              />
+                            </FormControl>
+                            {watchImages.length > 1 && (
+                              <Button 
+                                type="button" 
+                                variant="ghost" 
+                                size="icon"
+                                onClick={() => removeImageField(index)}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ))}
+                  
+                  {watchImages.length < 3 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="mt-2"
+                      onClick={addImageField}
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Another Image
+                    </Button>
+                  )}
+                </div>
 
                 <FormField
                   control={form.control}
@@ -303,14 +396,35 @@ const Admin = () => {
           <div className="rounded-lg border p-6 shadow-sm">
             <h2 className="mb-4 text-xl font-semibold">Preview</h2>
             
-            {imagePreview ? (
-              <div className="mb-4 overflow-hidden rounded-lg">
-                <img
-                  src={imagePreview}
-                  alt="Product preview"
-                  className="h-64 w-full object-cover"
-                  onError={() => setImagePreview("/placeholder.svg")}
-                />
+            {watchImages.length > 0 ? (
+              <div>
+                <div className="mb-4 overflow-hidden rounded-lg">
+                  <img
+                    src={watchImages[imagePreviewIndex] || "/placeholder.svg"}
+                    alt="Product preview"
+                    className="h-64 w-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "/placeholder.svg";
+                    }}
+                  />
+                </div>
+                
+                {watchImages.length > 1 && (
+                  <div className="mb-4 flex gap-2 justify-center">
+                    {watchImages.map((img, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setImagePreviewIndex(idx)}
+                        className={`h-2 w-2 rounded-full ${
+                          imagePreviewIndex === idx 
+                            ? "bg-cafePurple" 
+                            : "bg-gray-300"
+                        }`}
+                        aria-label={`View image ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
             ) : (
               <div className="mb-4 flex h-64 items-center justify-center rounded-lg bg-muted">
@@ -341,7 +455,8 @@ const Admin = () => {
               </p>
 
               <p className="font-semibold text-cafePurple">
-                ${(form.watch("price") || 0).toFixed(2)}
+                {getCurrencySymbol(watchCurrency)}{" "}
+                {(form.watch("price") || 0).toFixed(watchCurrency === "UGX" ? 0 : 2)}
               </p>
             </div>
           </div>
@@ -354,6 +469,8 @@ const Admin = () => {
               <li>Write detailed descriptions to help customers understand your products</li>
               <li>Mark your best/signature items as featured to highlight them</li>
               <li>Set competitive prices that reflect the quality of your products</li>
+              <li>Upload multiple images to showcase different angles/aspects of your product</li>
+              <li>Choose the appropriate currency based on your target market</li>
             </ul>
           </div>
         </div>
