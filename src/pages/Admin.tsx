@@ -230,6 +230,13 @@ const Admin = () => {
   // Get the current currency
   const watchCurrency = form.watch("currency") || "USD";
 
+  // Handle price change to prevent form submission
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    // Let the form handle the value through the Controller
+    form.setValue("price", parseFloat(e.target.value) || 0);
+  };
+
   return (
     <div className="container mx-auto px-4 py-10 md:py-16">
       <div className="mb-8 flex items-center justify-between">
@@ -298,8 +305,11 @@ const Admin = () => {
                           <Input 
                             type="number" 
                             placeholder="0.00" 
-                            step="0.01" 
-                            {...field} 
+                            step="0.01"
+                            onChange={handlePriceChange}
+                            value={field.value}
+                            onBlur={field.onBlur}
+                            name={field.name}
                           />
                         </FormControl>
                         <FormMessage />
@@ -550,7 +560,9 @@ const Admin = () => {
 
               <p className="font-semibold text-cafePurple">
                 {getCurrencySymbol(watchCurrency)}{" "}
-                {(form.watch("price") || 0).toFixed(watchCurrency === "UGX" ? 0 : 2)}
+                {typeof form.watch("price") === 'number' 
+                  ? form.watch("price").toFixed(watchCurrency === "UGX" ? 0 : 2) 
+                  : '0.00'}
               </p>
             </div>
           </div>
