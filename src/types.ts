@@ -18,3 +18,15 @@ export interface MenuCategory {
 export interface CartItem extends MenuItem {
   quantity: number;
 }
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  image: string;
+  images?: string[];
+  category: string;
+  featured: boolean;
+  currency: string;
+}

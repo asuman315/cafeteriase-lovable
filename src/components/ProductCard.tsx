@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { type Product } from "@/pages/Products";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 interface ProductCardProps {
   product: Product;
@@ -49,7 +50,9 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
   };
   
   // Handle adding product to cart
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setIsAddingToCart(true);
     
     // Simulate adding to cart with a timeout
@@ -71,48 +74,51 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
       transition={{ duration: 0.5, delay: index * 0.1 }}
       whileHover={{ y: -8 }}
     >
-      <div className="relative h-64 overflow-hidden">
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
-        />
-        {product.featured && (
-          <div className="absolute top-3 right-3 bg-cafePurple text-white p-1.5 rounded-full">
-            <Star className="h-4 w-4" />
-          </div>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
-          <div className="p-4 w-full">
-            <Button 
-              className="w-full bg-white text-cafePurple hover:bg-white/90"
-              size="sm"
-            >
-              Quick View
-            </Button>
+      <Link to={`/product/${product.id}`} className="flex flex-col h-full">
+        <div className="relative h-64 overflow-hidden">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+          />
+          {product.featured && (
+            <div className="absolute top-3 right-3 bg-cafePurple text-white p-1.5 rounded-full">
+              <Star className="h-4 w-4" />
+            </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
+            <div className="p-4 w-full">
+              <Button 
+                className="w-full bg-white text-cafePurple hover:bg-white/90"
+                size="sm"
+                asChild
+              >
+                <Link to={`/product/${product.id}`}>Quick View</Link>
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
-      
-      <div className="p-5 flex flex-col flex-grow">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="font-semibold text-xl line-clamp-1">{product.name}</h3>
-          <span className="text-cafePurple font-semibold">{formatPrice(product.price, product.currency)}</span>
+        
+        <div className="p-5 flex flex-col flex-grow">
+          <div className="flex justify-between items-start mb-2">
+            <h3 className="font-semibold text-xl line-clamp-1">{product.name}</h3>
+            <span className="text-cafePurple font-semibold">{formatPrice(product.price, product.currency)}</span>
+          </div>
+          
+          <p className="text-muted-foreground text-sm mb-4 line-clamp-2 flex-grow">
+            {stripRichText(product.description)}
+          </p>
+          
+          <Button 
+            className="w-full bg-cafePurple hover:bg-cafePurple-dark group"
+            onClick={handleAddToCart}
+            disabled={isAddingToCart}
+          >
+            <ShoppingCart className={`mr-2 h-4 w-4 ${isAddingToCart ? 'animate-bounce' : 'group-hover:animate-bounce'}`} /> 
+            {isAddingToCart ? "Adding..." : "Add to Cart"}
+          </Button>
         </div>
-        
-        <p className="text-muted-foreground text-sm mb-4 line-clamp-2 flex-grow">
-          {stripRichText(product.description)}
-        </p>
-        
-        <Button 
-          className="w-full bg-cafePurple hover:bg-cafePurple-dark group"
-          onClick={handleAddToCart}
-          disabled={isAddingToCart}
-        >
-          <ShoppingCart className={`mr-2 h-4 w-4 ${isAddingToCart ? 'animate-bounce' : 'group-hover:animate-bounce'}`} /> 
-          {isAddingToCart ? "Adding..." : "Add to Cart"}
-        </Button>
-      </div>
+      </Link>
     </motion.div>
   );
 };
