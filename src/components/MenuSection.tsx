@@ -4,10 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Plus, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { MenuItem } from "@/types";
-
-interface MenuSectionProps {
-  onAddToCart: (item: MenuItem) => void;
-}
+import { useCart } from "@/hooks/use-cart";
+import { toast } from "sonner";
 
 // Utility function to convert rich text to plain text and truncate
 const stripRichText = (text: string | null, maxLength = 80) => {
@@ -18,11 +16,12 @@ const stripRichText = (text: string | null, maxLength = 80) => {
     : stripped;
 };
 
-const MenuSection = ({ onAddToCart }: MenuSectionProps) => {
+const MenuSection = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -44,7 +43,7 @@ const MenuSection = ({ onAddToCart }: MenuSectionProps) => {
 
           // Map Supabase data to MenuItem objects
           const items: MenuItem[] = data.map(item => ({
-            id: parseInt(item.id.split('-')[0], 16), // Convert UUID part to number
+            id: item.id,
             name: item.name,
             description: stripRichText(item.description || ""),
             price: Number(item.price),
@@ -71,6 +70,21 @@ const MenuSection = ({ onAddToCart }: MenuSectionProps) => {
   const filteredItems = activeCategory 
     ? menuItems.filter(item => item.category === activeCategory)
     : menuItems;
+
+  const handleAddToCart = (item: MenuItem) => {
+    addToCart({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      price: item.price,
+      image: item.image,
+      category: item.category,
+      featured: item.featured,
+      currency: "USD"
+    });
+    
+    toast(`Added ${item.name} to cart`);
+  };
 
   return (
     <section id="menu" className="py-24 bg-cafeGray-light">
@@ -134,7 +148,7 @@ const MenuSection = ({ onAddToCart }: MenuSectionProps) => {
                     </div>
                     <p className="text-gray-600 text-sm mb-4 line-clamp-2">{item.description}</p>
                     <Button
-                      onClick={() => onAddToCart(item)}
+                      onClick={() => handleAddToCart(item)}
                       className="w-full bg-cafePurple hover:bg-cafePurple-dark"
                     >
                       <Plus className="mr-2 h-4 w-4" /> Add to Cart
