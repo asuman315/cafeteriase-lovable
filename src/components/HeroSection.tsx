@@ -1,5 +1,7 @@
+
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
+
 const HeroSection = () => {
   const scrollToMenu = () => {
     const menuSection = document.getElementById("menu");
@@ -9,7 +11,9 @@ const HeroSection = () => {
       });
     }
   };
-  return <section id="home" className="relative h-screen flex items-center justify-center bg-hero-pattern bg-cover bg-center">
+
+  return (
+    <section id="home" className="relative h-screen flex items-center justify-center bg-hero-pattern bg-cover bg-center">
       <div className="absolute inset-0 bg-gradient-to-b from-cafePurple-dark/60 to-cafePurple/60" />
       
       <div className="container mx-auto px-4 md:px-6 relative z-10">
@@ -32,8 +36,17 @@ const HeroSection = () => {
             </div>
           </div>
           
-          <div className="hidden md:flex w-1/2 items-center justify-center">
-            <img src="/lovable-uploads/3d98dbd5-f125-4671-9bc2-ad8e0d6c0577.png" alt="English breakfast with eggs, toast, mushrooms, beans and tomatoes" className="max-w-[450px] w-full mx-auto animate-float" />
+          <div className="hidden md:block w-1/2 p-4">
+            <div className="relative w-full max-w-[450px] h-[400px] mx-auto animate-float rounded-xl overflow-hidden">
+              <div className="absolute inset-0 bg-cafePurple/10 z-10 rounded-xl"></div>
+              <img 
+                src="/lovable-uploads/3d98dbd5-f125-4671-9bc2-ad8e0d6c0577.png" 
+                alt="English breakfast with eggs, toast, mushrooms, beans and tomatoes" 
+                className="absolute inset-0 w-full h-full object-cover rounded-xl"
+              />
+              <div className="absolute inset-0 shadow-inner rounded-xl"></div>
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-cafePurple-dark/60 to-transparent p-4"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -41,6 +54,8 @@ const HeroSection = () => {
       <button onClick={scrollToMenu} className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white animate-bounce">
         <ChevronDown className="h-10 w-10" />
       </button>
-    </section>;
+    </section>
+  );
 };
+
 export default HeroSection;
