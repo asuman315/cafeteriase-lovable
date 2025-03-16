@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { useCart } from "@/hooks/use-cart";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency } from "@/lib/utils";
@@ -12,6 +13,7 @@ import { toast } from "sonner";
 import DeliveryPreferencesForm from "@/components/DeliveryPreferencesForm";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import LoginModal from "@/components/LoginModal";
 
 enum CheckoutStep {
   SELECT_METHOD,
@@ -33,16 +35,16 @@ const Checkout = () => {
   const [shippingInfo, setShippingInfo] = useState<any>(null);
   const [deliveryPreferences, setDeliveryPreferences] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      toast.error("Please sign in to proceed with checkout");
-      navigate("/auth", { state: { returnTo: "/checkout" } });
+    if (!authLoading && !user && cartItems.length > 0) {
+      setIsAuthModalOpen(true);
     }
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading, cartItems.length]);
 
   const createStripeCheckoutSession = async () => {
     try {
@@ -120,6 +122,14 @@ const Checkout = () => {
     clearCart();
   };
 
+  const handleAuthSuccess = () => {
+    setIsAuthModalOpen(false);
+    // Continue with checkout
+    toast.success("Authentication successful", {
+      description: "You can now continue with your checkout",
+    });
+  };
+
   if (cartItems.length === 0 && step !== CheckoutStep.CONFIRMATION) {
     return (
       <div className="container mx-auto px-4 py-12 max-w-4xl">
@@ -145,6 +155,12 @@ const Checkout = () => {
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-5xl animate-fade-in">
+      <LoginModal 
+        open={isAuthModalOpen} 
+        onOpenChange={setIsAuthModalOpen}
+        onSuccess={handleAuthSuccess}
+      />
+      
       <div className="mb-12 text-center">
         <h1 className="text-4xl font-bold mb-3">Checkout</h1>
         <p className="text-muted-foreground max-w-lg mx-auto">
