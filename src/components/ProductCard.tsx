@@ -1,8 +1,8 @@
 
 import { motion } from "framer-motion";
-import { ShoppingCart, Star } from "lucide-react";
+import { ShoppingCart, Star, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { type Product } from "@/pages/Products";
+import { type Product } from "@/types";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
@@ -93,7 +93,10 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
                 size="sm"
                 asChild
               >
-                <Link to={`/product/${product.id}`}>Quick View</Link>
+                <Link to={`/product/${product.id}`}>
+                  <Eye className="mr-2 h-4 w-4" />
+                  View Details
+                </Link>
               </Button>
             </div>
           </div>

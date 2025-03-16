@@ -29,4 +29,5 @@ export interface Product {
   category: string;
   featured: boolean;
   currency: string;
+  isFavorite?: boolean;
 }

@@ -10,21 +10,22 @@ import { Button } from "@/components/ui/button";
 import { Coffee, Utensils, Cake, FilterX } from "lucide-react";
 import AdminCreateButton from "@/components/AdminCreateButton";
 import { toast } from "@/hooks/use-toast";
-
-export interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  category: string;
-  featured: boolean;
-  currency: string;
-}
+import NavBar from "@/components/NavBar";
+import Footer from "@/components/Footer";
+import { Product } from "@/types";
 
 const Products = () => {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [cartItemCount, setCartItemCount] = useState(0);
+
+  // Handle cart click for NavBar
+  const handleCartClick = () => {
+    toast({
+      title: "Cart",
+      description: "Cart functionality is not implemented yet.",
+    });
+  };
 
   // Get products from Supabase
   const { data: products = [], isLoading, error } = useQuery({
@@ -47,6 +48,7 @@ const Products = () => {
           price: item.price,
           // Use the first image in the array or a placeholder
           image: item.images && item.images[0] ? item.images[0] : '/placeholder.svg',
+          images: item.images || ['/placeholder.svg'],
           category: item.category || 'Coffee',
           featured: item.featured || false,
           currency: item.currency || 'USD'
@@ -77,9 +79,19 @@ const Products = () => {
 
   return (
     <div className="min-h-screen">
+      <NavBar onCartClick={handleCartClick} cartItemCount={cartItemCount} />
+      
+      {/* Header Section */}
+      <header className="bg-cafePurple-dark text-white py-6">
+        <div className="container mx-auto px-4">
+          <h1 className="text-2xl md:text-3xl font-bold">Our Products</h1>
+          <p className="text-sm md:text-base opacity-80">Discover our premium offerings</p>
+        </div>
+      </header>
+      
       <ProductHeroSection />
       
-      <section className="container mx-auto px-4 py-16">
+      <section className="container mx-auto px-4 py-16" id="products">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Our Products</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -205,6 +217,7 @@ const Products = () => {
       
       <TeamSection />
       <ContactSection />
+      <Footer />
       <AdminCreateButton />
     </div>
   );

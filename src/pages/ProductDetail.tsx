@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/hover-card";
 import ProductCard from "@/components/ProductCard";
 import { toast } from "@/hooks/use-toast";
-import { type Product } from "@/pages/Products";
+import { type Product } from "@/types";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 
@@ -33,6 +33,15 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
+  const [cartItemCount, setCartItemCount] = useState(0);
+  
+  // Handle cart click (for NavBar)
+  const handleCartClick = () => {
+    toast({
+      title: "Cart",
+      description: "Cart functionality is not implemented yet.",
+    });
+  };
   
   // Fetch product data
   const { data: product, isLoading: productLoading } = useQuery({
@@ -81,6 +90,7 @@ const ProductDetail = () => {
         description: item.description || '',
         price: item.price,
         image: item.images && item.images[0] ? item.images[0] : '/placeholder.svg',
+        images: item.images || ['/placeholder.svg'],
         category: item.category || 'Coffee',
         featured: item.featured || false,
         currency: item.currency || 'USD'
@@ -88,6 +98,13 @@ const ProductDetail = () => {
     },
     enabled: !!product?.category,
   });
+  
+  // Strip HTML tags from a string
+  const stripHtml = (html: string): string => {
+    const tmp = document.createElement('DIV');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  };
   
   // Mock reviews data
   const reviews = [
@@ -124,6 +141,7 @@ const ProductDetail = () => {
         className: "bg-green-50 border-green-200 text-green-800",
       });
       setIsAdding(false);
+      setCartItemCount(prev => prev + quantity);
     }, 800);
   };
   
@@ -158,9 +176,20 @@ const ProductDetail = () => {
     );
   }
   
+  // Prepare the description (convert HTML to plain text)
+  const plainDescription = stripHtml(product.description);
+  
   return (
     <div className="min-h-screen bg-white">
-      <NavBar />
+      <NavBar onCartClick={handleCartClick} cartItemCount={cartItemCount} />
+      
+      {/* Header Section */}
+      <header className="bg-cafePurple-dark text-white py-6">
+        <div className="container mx-auto px-4">
+          <h1 className="text-2xl md:text-3xl font-bold">Product Details</h1>
+          <p className="text-sm md:text-base opacity-80">Explore our delicious offerings</p>
+        </div>
+      </header>
       
       {/* Breadcrumb navigation */}
       <nav className="container mx-auto px-4 pt-8 pb-4">
@@ -181,7 +210,7 @@ const ProductDetail = () => {
             <div className="md:w-1/2">
               <div className="relative rounded-2xl overflow-hidden h-[400px] md:h-[500px] shadow-lg mb-4">
                 <motion.img 
-                  src={product.images[activeImageIndex]} 
+                  src={product.images?.[activeImageIndex] || product.image} 
                   alt={product.name}
                   className="w-full h-full object-cover" 
                   initial={{ opacity: 0 }}
@@ -191,7 +220,7 @@ const ProductDetail = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-60" />
               </div>
               
-              {product.images.length > 1 && (
+              {product.images && product.images.length > 1 && (
                 <div className="flex space-x-2 overflow-x-auto pb-2">
                   {product.images.map((image, index) => (
                     <button
@@ -237,7 +266,7 @@ const ProductDetail = () => {
               
               <div className="glass-morphism p-6 rounded-xl">
                 <p className="text-gray-700 leading-relaxed">
-                  {product.description}
+                  {plainDescription}
                 </p>
                 
                 <div className="flex items-center space-x-2 mt-4">
