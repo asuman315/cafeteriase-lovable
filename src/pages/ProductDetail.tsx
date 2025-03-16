@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -27,24 +26,20 @@ import { toast } from "@/hooks/use-toast";
 import { type Product } from "@/types";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
+import { useCart } from "@/hooks/use-cart";
+import ShoppingCart from "@/components/ShoppingCart";
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
-  const [cartItemCount, setCartItemCount] = useState(0);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const { totalItems: cartItemCount, addToCart } = useCart();
   
   // Update cart count and check favorite status
   useEffect(() => {
-    // Update cart count
-    const updateCartCount = () => {
-      const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
-      const count = cartItems.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
-      setCartItemCount(count);
-    };
-    
     // Check favorite status
     const checkFavoriteStatus = () => {
       if (!id) return;
@@ -53,31 +48,15 @@ const ProductDetail = () => {
     };
     
     // Initial updates
-    updateCartCount();
     checkFavoriteStatus();
     
     // Listen for storage events
-    window.addEventListener('storage', updateCartCount);
     window.addEventListener('storage', checkFavoriteStatus);
     
-    // Custom events
-    const handleCartUpdate = () => updateCartCount();
-    window.addEventListener('cartUpdated', handleCartUpdate);
-    
     return () => {
-      window.removeEventListener('storage', updateCartCount);
       window.removeEventListener('storage', checkFavoriteStatus);
-      window.removeEventListener('cartUpdated', handleCartUpdate);
     };
   }, [id]);
-  
-  // Handle cart click (for NavBar)
-  const handleCartClick = () => {
-    toast({
-      title: "Cart",
-      description: "Cart functionality is now implemented! Check your cart.",
-    });
-  };
   
   // Fetch product data
   const { data: product, isLoading: productLoading } = useQuery({
@@ -169,38 +148,17 @@ const ProductDetail = () => {
     
     setIsAdding(true);
     
-    // Get existing cart items
-    const cartItems = JSON.parse(localStorage.getItem('cartItems') || '[]');
-    
-    // Check if product is already in cart
-    const existingItemIndex = cartItems.findIndex((item: any) => item.id === product.id);
-    
-    if (existingItemIndex >= 0) {
-      // Update quantity if already in cart
-      cartItems[existingItemIndex].quantity = (cartItems[existingItemIndex].quantity || 0) + quantity;
-    } else {
-      // Add new item to cart
-      cartItems.push({
-        ...product,
-        quantity: quantity
-      });
-    }
-    
-    // Save to localStorage
-    localStorage.setItem('cartItems', JSON.stringify(cartItems));
-    
-    // Dispatch custom event
-    window.dispatchEvent(new Event('cartUpdated'));
-    
-    // Simulate adding to cart
     setTimeout(() => {
-      toast({
-        title: "Added to cart",
-        description: `${quantity} × ${product.name} added to your cart`,
-        className: "bg-green-50 border-green-200 text-green-800",
-      });
+      if (product) {
+        addToCart(product, quantity);
+        
+        toast({
+          title: "Added to cart",
+          description: `${quantity} × ${product.name} added to your cart`,
+          className: "bg-green-50 border-green-200 text-green-800",
+        });
+      }
       setIsAdding(false);
-      setCartItemCount(prev => prev + quantity);
     }, 800);
   };
   
@@ -266,14 +224,16 @@ const ProductDetail = () => {
   }
   
   // Prepare the description (convert HTML to plain text)
-  const plainDescription = stripHtml(product.description);
+  const plainDescription = typeof product?.description === 'string' ? 
+    stripHtml(product.description) : '';
   
   return (
     <div className="min-h-screen bg-white">
-      <NavBar onCartClick={handleCartClick} cartItemCount={cartItemCount} />
+      <NavBar onCartClick={() => setIsCartOpen(true)} cartItemCount={cartItemCount} />
+      <ShoppingCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
       
       {/* Header Section */}
-      <header className="bg-cafePurple-dark text-white py-6">
+      <header className="bg-cafePurple-dark text-white py-6 mt-16">
         <div className="container mx-auto px-4">
           <h1 className="text-2xl md:text-3xl font-bold">Product Details</h1>
           <p className="text-sm md:text-base opacity-80">Explore our delicious offerings</p>

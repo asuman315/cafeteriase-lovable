@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import UserMenu from "@/components/UserMenu";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import ShoppingCart from "@/components/ShoppingCart";
 import { useCart } from "@/hooks/use-cart";
 
@@ -18,6 +18,7 @@ const NavBar = ({ onCartClick, cartItemCount: propCartItemCount }: NavBarProps) 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { totalItems } = useCart();
+  const location = useLocation();
   
   // Use prop cartItemCount if provided, otherwise use from hook
   const cartItemCount = propCartItemCount !== undefined ? propCartItemCount : totalItems;
@@ -48,6 +49,16 @@ const NavBar = ({ onCartClick, cartItemCount: propCartItemCount }: NavBarProps) 
     { name: "Products", href: "/products" },
     { name: "Favorites", href: "/favorites" },
   ];
+  
+  const isActivePath = (path: string) => {
+    if (path === '/' && location.pathname === '/') {
+      return true;
+    }
+    if (path !== '/' && location.pathname.startsWith(path)) {
+      return true;
+    }
+    return false;
+  };
 
   return (
     <>
@@ -77,6 +88,7 @@ const NavBar = ({ onCartClick, cartItemCount: propCartItemCount }: NavBarProps) 
                     to={link.href}
                     className={cn(
                       "font-medium transition-colors",
+                      isActivePath(link.href) ? "text-cafePurple font-semibold" : "",
                       isScrolled
                         ? "text-gray-700 hover:text-cafePurple"
                         : "text-white hover:text-white/80"
@@ -159,7 +171,10 @@ const NavBar = ({ onCartClick, cartItemCount: propCartItemCount }: NavBarProps) 
                 <Link
                   key={link.name}
                   to={link.href}
-                  className="text-gray-700 hover:text-cafePurple font-medium text-lg py-2 transition-colors"
+                  className={cn(
+                    "text-gray-700 hover:text-cafePurple font-medium text-lg py-2 transition-colors",
+                    isActivePath(link.href) ? "text-cafePurple font-semibold" : ""
+                  )}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.name}

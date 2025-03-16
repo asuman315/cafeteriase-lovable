@@ -154,7 +154,7 @@ const Checkout = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12 max-w-5xl animate-fade-in flex flex-col items-center">
+    <div className="container mx-auto px-4 py-12 max-w-5xl animate-fade-in">
       <LoginModal 
         open={isAuthModalOpen} 
         onOpenChange={setIsAuthModalOpen}
@@ -162,7 +162,7 @@ const Checkout = () => {
         forceOpen={!user && isAuthModalOpen}
       />
       
-      <div className="mb-12 text-center max-w-3xl">
+      <div className="mb-12 text-center max-w-3xl mx-auto">
         <h1 className="text-4xl font-bold mb-3">Checkout</h1>
         <p className="text-muted-foreground mx-auto">
           {step === CheckoutStep.SELECT_METHOD && "Choose your preferred payment method to continue."}
@@ -175,8 +175,8 @@ const Checkout = () => {
       <div className="grid grid-cols-1 md:grid-cols-5 gap-8 w-full">
         <div className={`md:col-span-${step === CheckoutStep.CONFIRMATION ? "5" : "3"} ${step === CheckoutStep.CONFIRMATION ? "mx-auto max-w-2xl w-full" : ""}`}>
           {step === CheckoutStep.SELECT_METHOD && (
-            <div className="grid gap-6">
-              <Card className="hover:shadow-lg transition-shadow duration-300">
+            <div className="grid gap-6 w-full mx-auto">
+              <Card className="hover:shadow-lg transition-shadow duration-300 w-full">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Truck className="h-5 w-5" />
@@ -200,7 +200,7 @@ const Checkout = () => {
                 </CardFooter>
               </Card>
 
-              <Card className="hover:shadow-lg transition-shadow duration-300">
+              <Card className="hover:shadow-lg transition-shadow duration-300 w-full">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <CreditCard className="h-5 w-5" />

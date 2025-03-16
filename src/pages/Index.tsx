@@ -8,6 +8,7 @@ import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import AdminCreateButton from "@/components/AdminCreateButton";
 import ShoppingCart from "@/components/ShoppingCart";
+import FeaturedProducts from "@/components/FeaturedProducts";
 import { useCart } from "@/hooks/use-cart";
 
 const Index = () => {
@@ -48,6 +49,8 @@ const Index = () => {
       <HeroSection />
       
       <MenuSection />
+      
+      <FeaturedProducts />
       
       <AboutSection />
       
