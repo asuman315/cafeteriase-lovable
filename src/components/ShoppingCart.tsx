@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/hooks/use-cart";
 import { toast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 interface ShoppingCartProps {
   isOpen: boolean;
@@ -15,6 +15,7 @@ interface ShoppingCartProps {
 const ShoppingCart = ({ isOpen, onClose }: ShoppingCartProps) => {
   const [isClosing, setIsClosing] = useState(false);
   const { cartItems, totalPrice, updateQuantity, removeFromCart, clearCart } = useCart();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!isOpen) {
@@ -38,14 +39,8 @@ const ShoppingCart = ({ isOpen, onClose }: ShoppingCartProps) => {
 
   // Handle checkout
   const handleCheckout = () => {
-    toast({
-      title: "Checkout",
-      description: "Proceeding to checkout with your items",
-      className: "bg-green-50 border-green-200 text-green-800",
-    });
-    // This would typically navigate to a checkout page
-    // For now, we'll just close the cart
     handleClose();
+    navigate('/checkout');
   };
 
   return (

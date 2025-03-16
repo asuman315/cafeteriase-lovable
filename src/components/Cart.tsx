@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { X, Plus, Minus, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CartItem } from "@/types";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 interface CartProps {
   isOpen: boolean;
@@ -22,6 +22,7 @@ const Cart = ({
   onRemoveItem,
 }: CartProps) => {
   const [isClosing, setIsClosing] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!isOpen) {
@@ -38,6 +39,11 @@ const Cart = ({
     (total, item) => total + item.price * item.quantity,
     0
   );
+
+  const handleCheckout = () => {
+    handleClose();
+    navigate('/checkout');
+  };
 
   if (!isOpen && !isClosing) return null;
 
@@ -140,7 +146,7 @@ const Cart = ({
                 <p>Subtotal</p>
                 <p>${subtotal.toFixed(2)}</p>
               </div>
-              <Button className="w-full bg-cafePurple hover:bg-cafePurple-dark">
+              <Button className="w-full bg-cafePurple hover:bg-cafePurple-dark" onClick={handleCheckout}>
                 Checkout
               </Button>
               <p className="mt-2 text-center text-sm text-gray-500">
