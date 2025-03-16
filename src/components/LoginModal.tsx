@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -13,9 +14,10 @@ interface LoginModalProps {
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
   forceOpen?: boolean;
+  hideAdminOption?: boolean;
 }
 
-const LoginModal = ({ open, onOpenChange, onSuccess, forceOpen = false }: LoginModalProps) => {
+const LoginModal = ({ open, onOpenChange, onSuccess, forceOpen = false, hideAdminOption = false }: LoginModalProps) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -187,7 +189,7 @@ const LoginModal = ({ open, onOpenChange, onSuccess, forceOpen = false }: LoginM
               </Button>
             </div>
             
-            {isLogin && (
+            {isLogin && !hideAdminOption && (
               <div className="text-center">
                 <Button 
                   type="button" 

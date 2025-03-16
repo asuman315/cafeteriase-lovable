@@ -160,6 +160,7 @@ const Checkout = () => {
         onOpenChange={setIsAuthModalOpen}
         onSuccess={handleAuthSuccess}
         forceOpen={!user && isAuthModalOpen}
+        hideAdminOption={true}
       />
       
       <div className="mb-12 text-center max-w-3xl mx-auto">
@@ -172,135 +173,89 @@ const Checkout = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-8 w-full">
-        <div className={`md:col-span-${step === CheckoutStep.CONFIRMATION ? "5" : "3"} ${step === CheckoutStep.CONFIRMATION ? "mx-auto max-w-2xl w-full" : ""}`}>
-          {step === CheckoutStep.SELECT_METHOD && (
-            <div className="grid gap-6 w-full mx-auto">
-              <Card className="hover:shadow-lg transition-shadow duration-300 w-full">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Truck className="h-5 w-5" />
-                    Pay on Delivery
-                  </CardTitle>
-                  <CardDescription>
-                    Pay with cash when your order is delivered to your doorstep
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm">
-                    Our delivery personnel will collect payment when they deliver your order.
-                    You can inspect your items before paying.
-                  </p>
-                </CardContent>
-                <CardFooter>
-                  <Button onClick={() => handleSelectPaymentMethod(PaymentMethod.ON_DELIVERY)} className="w-full">
-                    <span>Continue</span>
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </CardFooter>
-              </Card>
-
-              <Card className="hover:shadow-lg transition-shadow duration-300 w-full">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <CreditCard className="h-5 w-5" />
-                    Pay with Stripe
-                  </CardTitle>
-                  <CardDescription>
-                    Secure, fast payments with credit or debit card
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm">
-                    You'll be redirected to Stripe's secure payment page to complete your purchase.
-                    All major credit and debit cards accepted.
-                  </p>
-                </CardContent>
-                <CardFooter>
-                  <Button 
-                    onClick={() => handleSelectPaymentMethod(PaymentMethod.STRIPE)} 
-                    className="w-full"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        <span>Processing...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Continue</span>
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                </CardFooter>
-              </Card>
-            </div>
-          )}
-
-          {step === CheckoutStep.DELIVERY_PREFERENCES && (
-            <DeliveryPreferencesForm onSubmit={handleDeliveryPreferencesSubmit} />
-          )}
-
-          {step === CheckoutStep.SHIPPING_INFO && (
-            <ShippingForm onSubmit={handleShippingInfoSubmit} />
-          )}
-
-          {step === CheckoutStep.CONFIRMATION && (
-            <Card className="animate-scale-in w-full">
+      {step === CheckoutStep.SELECT_METHOD && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl mx-auto">
+          <div className="space-y-8">
+            <Card className="hover:shadow-lg transition-shadow duration-300 w-full h-full">
               <CardHeader>
-                <div className="flex items-center justify-center mb-4">
-                  <CheckCircle2 className="h-16 w-16 text-green-500" />
-                </div>
-                <CardTitle className="text-center text-2xl">Order Confirmed!</CardTitle>
-                <CardDescription className="text-center">
-                  Your order has been placed successfully. Thank you for shopping with us!
+                <CardTitle className="flex items-center gap-2 text-2xl">
+                  <Truck className="h-6 w-6" />
+                  Pay on Delivery
+                </CardTitle>
+                <CardDescription className="text-base">
+                  Pay with cash when your order is delivered to your doorstep
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-medium mb-2">Order Details</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Payment Method: {paymentMethod === PaymentMethod.ON_DELIVERY ? "Pay on Delivery" : "Credit Card (Stripe)"}
-                    </p>
-                    {deliveryPreferences && (
-                      <div className="mt-4">
-                        <h3 className="font-medium mb-2">Delivery Preferences</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Phone: {deliveryPreferences.phone}<br />
-                          District: {deliveryPreferences.district}<br />
-                          {deliveryPreferences.email && `Email: ${deliveryPreferences.email}`}<br />
-                          {deliveryPreferences.city && `City/Town: ${deliveryPreferences.city}`}<br />
-                          Preferred Delivery Time: {deliveryPreferences.deliveryTime}
-                        </p>
-                      </div>
-                    )}
-                    {shippingInfo && (
-                      <div className="mt-4">
-                        <h3 className="font-medium mb-2">Delivery Address</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {shippingInfo.fullName}<br />
-                          {shippingInfo.address}<br />
-                          {shippingInfo.city}, {shippingInfo.zipCode}<br />
-                          Phone: {shippingInfo.phone}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <p className="text-sm text-gray-600 mb-6">
+                  Our delivery personnel will collect payment when they deliver your order.
+                  You can inspect your items before paying.
+                </p>
               </CardContent>
-              <CardFooter className="flex justify-center">
-                <Button onClick={() => navigate("/")} className="w-full max-w-xs">
-                  Continue Shopping
+              <CardFooter>
+                <Button 
+                  onClick={() => handleSelectPaymentMethod(PaymentMethod.ON_DELIVERY)} 
+                  className="w-full bg-cafePurple hover:bg-cafePurple-dark"
+                >
+                  <span>Continue</span>
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </CardFooter>
             </Card>
-          )}
-        </div>
 
-        {step !== CheckoutStep.CONFIRMATION && (
+            <Card className="hover:shadow-lg transition-shadow duration-300 w-full h-full">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-2xl">
+                  <CreditCard className="h-6 w-6" />
+                  Pay with Stripe
+                </CardTitle>
+                <CardDescription className="text-base">
+                  Secure, fast payments with credit or debit card
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600 mb-6">
+                  You'll be redirected to Stripe's secure payment page to complete your purchase.
+                  All major credit and debit cards accepted.
+                </p>
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  onClick={() => handleSelectPaymentMethod(PaymentMethod.STRIPE)} 
+                  className="w-full bg-cafePurple hover:bg-cafePurple-dark"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <span>Processing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Continue</span>
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
+
+          <div>
+            <OrderSummary 
+              items={cartItems} 
+              totalPrice={totalPrice} 
+              showItems={true} 
+            />
+          </div>
+        </div>
+      )}
+
+      {step === CheckoutStep.DELIVERY_PREFERENCES && (
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 w-full">
+          <div className="md:col-span-3">
+            <DeliveryPreferencesForm onSubmit={handleDeliveryPreferencesSubmit} />
+          </div>
           <div className="md:col-span-2">
             <OrderSummary 
               items={cartItems} 
@@ -308,8 +263,77 @@ const Checkout = () => {
               showItems={true} 
             />
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {step === CheckoutStep.SHIPPING_INFO && (
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 w-full">
+          <div className="md:col-span-3">
+            <ShippingForm onSubmit={handleShippingInfoSubmit} />
+          </div>
+          <div className="md:col-span-2">
+            <OrderSummary 
+              items={cartItems} 
+              totalPrice={totalPrice} 
+              showItems={true} 
+            />
+          </div>
+        </div>
+      )}
+
+      {step === CheckoutStep.CONFIRMATION && (
+        <div className="mx-auto max-w-2xl w-full">
+          <Card className="animate-scale-in w-full">
+            <CardHeader>
+              <div className="flex items-center justify-center mb-4">
+                <CheckCircle2 className="h-16 w-16 text-green-500" />
+              </div>
+              <CardTitle className="text-center text-2xl">Order Confirmed!</CardTitle>
+              <CardDescription className="text-center">
+                Your order has been placed successfully. Thank you for shopping with us!
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-medium mb-2">Order Details</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Payment Method: {paymentMethod === PaymentMethod.ON_DELIVERY ? "Pay on Delivery" : "Credit Card (Stripe)"}
+                  </p>
+                  {deliveryPreferences && (
+                    <div className="mt-4">
+                      <h3 className="font-medium mb-2">Delivery Preferences</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Phone: {deliveryPreferences.phone}<br />
+                        District: {deliveryPreferences.district}<br />
+                        {deliveryPreferences.email && `Email: ${deliveryPreferences.email}`}<br />
+                        {deliveryPreferences.city && `City/Town: ${deliveryPreferences.city}`}<br />
+                        Preferred Delivery Time: {deliveryPreferences.deliveryTime}
+                      </p>
+                    </div>
+                  )}
+                  {shippingInfo && (
+                    <div className="mt-4">
+                      <h3 className="font-medium mb-2">Delivery Address</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {shippingInfo.fullName}<br />
+                        {shippingInfo.address}<br />
+                        {shippingInfo.city}, {shippingInfo.zipCode}<br />
+                        Phone: {shippingInfo.phone}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="flex justify-center">
+              <Button onClick={() => navigate("/")} className="w-full max-w-xs">
+                Continue Shopping
+              </Button>
+            </CardFooter>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };
