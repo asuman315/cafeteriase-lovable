@@ -6,16 +6,14 @@ import MenuSection from "@/components/MenuSection";
 import AboutSection from "@/components/AboutSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
-import Cart from "@/components/Cart";
 import AdminCreateButton from "@/components/AdminCreateButton";
-import { MenuItem, CartItem } from "@/types";
-import { useToast } from "@/components/ui/use-toast";
+import ShoppingCart from "@/components/ShoppingCart";
+import { useCart } from "@/hooks/use-cart";
 
 const Index = () => {
-  const { toast } = useToast();
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [loadingHero, setLoadingHero] = useState(true);
+  const { totalItems } = useCart();
 
   useEffect(() => {
     // Simulate loading hero image
@@ -31,45 +29,6 @@ const Index = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleAddToCart = (item: MenuItem) => {
-    setCartItems((prevItems) => {
-      const existingItem = prevItems.find((cartItem) => cartItem.id === item.id);
-      
-      if (existingItem) {
-        return prevItems.map((cartItem) =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        );
-      } else {
-        return [...prevItems, { ...item, quantity: 1 }];
-      }
-    });
-    
-    toast({
-      title: "Added to cart",
-      description: `${item.name} has been added to your cart.`,
-      duration: 3000,
-    });
-  };
-
-  const handleUpdateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity <= 0) {
-      handleRemoveItem(id);
-      return;
-    }
-    
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      )
-    );
-  };
-
-  const handleRemoveItem = (id: number) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-  };
-
   return (
     <div className="min-h-screen">
       {loadingHero ? (
@@ -83,12 +42,12 @@ const Index = () => {
       
       <NavBar
         onCartClick={() => setIsCartOpen(true)}
-        cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+        cartItemCount={totalItems}
       />
       
       <HeroSection />
       
-      <MenuSection onAddToCart={handleAddToCart} />
+      <MenuSection />
       
       <AboutSection />
       
@@ -96,12 +55,9 @@ const Index = () => {
       
       <Footer />
       
-      <Cart
+      <ShoppingCart
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
-        items={cartItems}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveItem}
       />
       
       <AdminCreateButton />

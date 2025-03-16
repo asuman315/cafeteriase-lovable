@@ -16,9 +16,17 @@ export function useCart() {
     const loadCart = () => {
       const storedCart = localStorage.getItem('cartItems');
       if (storedCart) {
-        const parsedCart = JSON.parse(storedCart) as CartItem[];
-        setCartItems(parsedCart);
-        updateTotals(parsedCart);
+        try {
+          const parsedCart = JSON.parse(storedCart) as CartItem[];
+          setCartItems(parsedCart);
+          updateTotals(parsedCart);
+        } catch (error) {
+          console.error("Error parsing cart from localStorage:", error);
+          // Reset cart if there's a parsing error
+          localStorage.removeItem('cartItems');
+          setCartItems([]);
+          updateTotals([]);
+        }
       }
     };
 

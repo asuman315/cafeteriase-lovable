@@ -13,11 +13,13 @@ import { toast } from "@/hooks/use-toast";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { Product } from "@/types";
+import ShoppingCart from "@/components/ShoppingCart";
 
 const Products = () => {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [cartItemCount, setCartItemCount] = useState(0);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   
   // Update cart count when component mounts or cart changes
   useEffect(() => {
@@ -45,10 +47,7 @@ const Products = () => {
 
   // Handle cart click for NavBar
   const handleCartClick = () => {
-    toast({
-      title: "Cart",
-      description: "Cart functionality is not implemented yet.",
-    });
+    setIsCartOpen(true);
   };
 
   // Get products from Supabase
@@ -243,6 +242,9 @@ const Products = () => {
       <ContactSection />
       <Footer />
       <AdminCreateButton />
+      
+      {/* Shopping Cart Drawer */}
+      <ShoppingCart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </div>
   );
 };

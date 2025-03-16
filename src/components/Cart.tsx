@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { X, Plus, Minus, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CartItem } from "@/types";
+import { Link } from "react-router-dom";
 
 interface CartProps {
   isOpen: boolean;
