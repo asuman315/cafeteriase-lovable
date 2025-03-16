@@ -27,6 +27,8 @@ interface OrderDetails {
   items: OrderItem[];
   totalPrice: number;
   notes?: string;
+  district?: string;
+  deliveryTime?: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -65,6 +67,15 @@ const handler = async (req: Request): Promise<Response> => {
           <h2 style="color: #1D1D1F; font-size: 18px; margin: 0 0 15px; border-bottom: 1px solid #ddd; padding-bottom: 8px;">Order Details</h2>
           <p><strong>Order Date:</strong> ${orderDate}</p>
           <p><strong>Payment Method:</strong> Pay on Delivery</p>
+          ${orderDetails.deliveryTime ? `<p><strong>Preferred Delivery Time:</strong> ${orderDetails.deliveryTime}</p>` : ''}
+        </div>
+
+        <div style="margin-bottom: 25px; padding: 15px; background-color: #f5f5f7; border-radius: 5px;">
+          <h2 style="color: #1D1D1F; font-size: 18px; margin: 0 0 15px; border-bottom: 1px solid #ddd; padding-bottom: 8px;">Customer Information</h2>
+          <p><strong>Name:</strong> ${orderDetails.fullName}</p>
+          <p><strong>Phone:</strong> ${orderDetails.phone}</p>
+          <p><strong>Email:</strong> ${orderDetails.email}</p>
+          ${orderDetails.district ? `<p><strong>District:</strong> ${orderDetails.district}</p>` : ''}
         </div>
 
         <div style="margin-bottom: 25px; padding: 15px; background-color: #f5f5f7; border-radius: 5px;">
@@ -73,6 +84,7 @@ const handler = async (req: Request): Promise<Response> => {
           <p>${orderDetails.address}</p>
           <p>${orderDetails.city}, ${orderDetails.zipCode}</p>
           <p>Phone: ${orderDetails.phone}</p>
+          ${orderDetails.notes ? `<p><strong>Delivery Notes:</strong> ${orderDetails.notes}</p>` : ''}
         </div>
 
         <div style="margin-bottom: 25px; padding: 15px; background-color: #f5f5f7; border-radius: 5px;">

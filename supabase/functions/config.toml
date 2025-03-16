@@ -1,8 +1,13 @@
 
-project_id = "cafe-ecommerce"
+project_id = "ypedypnxcsikqvzjqcvy"
 
-[global.build]
-command = ""
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage"]
+extra_search_path = ["extensions"]
+max_rows = 1000
 
-[[global.env]]
-name = "RESEND_API_KEY"
+[functions]
+[functions.send-order-confirmation]
+verify_jwt = false

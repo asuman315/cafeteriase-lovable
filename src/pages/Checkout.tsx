@@ -10,9 +10,11 @@ import ShippingForm from "@/components/ShippingForm";
 import OrderSummary from "@/components/OrderSummary";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import DeliveryPreferencesForm from "@/components/DeliveryPreferencesForm";
 
 enum CheckoutStep {
   SELECT_METHOD,
+  DELIVERY_PREFERENCES,
   SHIPPING_INFO,
   PAYMENT,
   CONFIRMATION
@@ -28,13 +30,14 @@ const Checkout = () => {
   const [step, setStep] = useState<CheckoutStep>(CheckoutStep.SELECT_METHOD);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const [shippingInfo, setShippingInfo] = useState<any>(null);
+  const [deliveryPreferences, setDeliveryPreferences] = useState<any>(null);
   const navigate = useNavigate();
 
   // Helper function to handle payment method selection
   const handleSelectPaymentMethod = (method: PaymentMethod) => {
     setPaymentMethod(method);
     if (method === PaymentMethod.ON_DELIVERY) {
-      setStep(CheckoutStep.SHIPPING_INFO);
+      setStep(CheckoutStep.DELIVERY_PREFERENCES);
     } else {
       // Simulate Stripe checkout process
       toast.info("Redirecting to Stripe...", {
@@ -49,9 +52,15 @@ const Checkout = () => {
     }
   };
 
+  // Helper function to handle delivery preferences submission
+  const handleDeliveryPreferencesSubmit = (values: any) => {
+    setDeliveryPreferences(values);
+    setStep(CheckoutStep.SHIPPING_INFO);
+  };
+
   // Helper function to handle form submission for shipping info
   const handleShippingInfoSubmit = (values: any) => {
-    setShippingInfo(values);
+    setShippingInfo({...values, ...deliveryPreferences});
     toast.success("Order placed successfully!", {
       duration: 2000,
     });
@@ -78,6 +87,7 @@ const Checkout = () => {
         <h1 className="text-4xl font-bold mb-3">Checkout</h1>
         <p className="text-muted-foreground max-w-lg mx-auto">
           {step === CheckoutStep.SELECT_METHOD && "Choose your preferred payment method to continue."}
+          {step === CheckoutStep.DELIVERY_PREFERENCES && "Please provide your delivery preferences."}
           {step === CheckoutStep.SHIPPING_INFO && "Please provide your delivery information."}
           {step === CheckoutStep.CONFIRMATION && "Thank you for your order!"}
         </p>
@@ -137,6 +147,10 @@ const Checkout = () => {
             </div>
           )}
 
+          {step === CheckoutStep.DELIVERY_PREFERENCES && (
+            <DeliveryPreferencesForm onSubmit={handleDeliveryPreferencesSubmit} />
+          )}
+
           {step === CheckoutStep.SHIPPING_INFO && (
             <ShippingForm onSubmit={handleShippingInfoSubmit} />
           )}
@@ -159,6 +173,18 @@ const Checkout = () => {
                     <p className="text-sm text-muted-foreground">
                       Payment Method: {paymentMethod === PaymentMethod.ON_DELIVERY ? "Pay on Delivery" : "Credit Card (Stripe)"}
                     </p>
+                    {deliveryPreferences && (
+                      <div className="mt-4">
+                        <h3 className="font-medium mb-2">Delivery Preferences</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Phone: {deliveryPreferences.phone}<br />
+                          District: {deliveryPreferences.district}<br />
+                          {deliveryPreferences.email && `Email: ${deliveryPreferences.email}`}<br />
+                          {deliveryPreferences.city && `City/Town: ${deliveryPreferences.city}`}<br />
+                          Preferred Delivery Time: {deliveryPreferences.deliveryTime}
+                        </p>
+                      </div>
+                    )}
                     {shippingInfo && (
                       <div className="mt-4">
                         <h3 className="font-medium mb-2">Delivery Address</h3>

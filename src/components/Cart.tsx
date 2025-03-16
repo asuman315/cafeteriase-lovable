@@ -118,7 +118,7 @@ const Cart = ({
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
-                            onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+                            onClick={() => onUpdateQuantity(Number(item.id), item.quantity - 1)}
                             disabled={item.quantity <= 1}
                           >
                             <Minus className="h-3 w-3" />
@@ -128,7 +128,7 @@ const Cart = ({
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
-                            onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                            onClick={() => onUpdateQuantity(Number(item.id), item.quantity + 1)}
                           >
                             <Plus className="h-3 w-3" />
                           </Button>
@@ -136,7 +136,7 @@ const Cart = ({
                         <Button
                           variant="ghost"
                           className="text-sm text-gray-500"
-                          onClick={() => onRemoveItem(item.id)}
+                          onClick={() => onRemoveItem(Number(item.id))}
                         >
                           Remove
                         </Button>
