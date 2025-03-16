@@ -37,7 +37,8 @@ const Checkout = () => {
   const handleSelectPaymentMethod = (method: PaymentMethod) => {
     setPaymentMethod(method);
     if (method === PaymentMethod.ON_DELIVERY) {
-      setStep(CheckoutStep.DELIVERY_PREFERENCES);
+      // Skip the delivery preferences step and go directly to shipping info
+      setStep(CheckoutStep.SHIPPING_INFO);
     } else {
       // Simulate Stripe checkout process
       toast.info("Redirecting to Stripe...", {
@@ -60,7 +61,8 @@ const Checkout = () => {
 
   // Helper function to handle form submission for shipping info
   const handleShippingInfoSubmit = (values: any) => {
-    setShippingInfo({...values, ...deliveryPreferences});
+    // If delivery preferences were not collected, we'll just use the shipping info
+    setShippingInfo(values);
     toast.success("Order placed successfully!", {
       duration: 2000,
     });
