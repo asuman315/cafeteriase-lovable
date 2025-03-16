@@ -10,8 +10,8 @@ interface CartProps {
   isOpen: boolean;
   onClose: () => void;
   items: CartItem[];
-  onUpdateQuantity: (id: number, newQuantity: number) => void;
-  onRemoveItem: (id: number) => void;
+  onUpdateQuantity: (id: string, newQuantity: number) => void;
+  onRemoveItem: (id: string) => void;
 }
 
 const Cart = ({
@@ -140,8 +140,13 @@ const Cart = ({
                 <p>Subtotal</p>
                 <p>${subtotal.toFixed(2)}</p>
               </div>
-              <Button className="w-full bg-cafePurple hover:bg-cafePurple-dark">
-                Checkout
+              <Button 
+                className="w-full bg-cafePurple hover:bg-cafePurple-dark"
+                asChild
+              >
+                <Link to="/checkout" onClick={handleClose}>
+                  Checkout
+                </Link>
               </Button>
               <p className="mt-2 text-center text-sm text-gray-500">
                 or{" "}

@@ -36,18 +36,6 @@ const ShoppingCart = ({ isOpen, onClose }: ShoppingCartProps) => {
     return `${currencySymbol}${price.toFixed(2)}`;
   };
 
-  // Handle checkout
-  const handleCheckout = () => {
-    toast({
-      title: "Checkout",
-      description: "Proceeding to checkout with your items",
-      className: "bg-green-50 border-green-200 text-green-800",
-    });
-    // This would typically navigate to a checkout page
-    // For now, we'll just close the cart
-    handleClose();
-  };
-
   return (
     <div
       className={cn(
@@ -150,8 +138,11 @@ const ShoppingCart = ({ isOpen, onClose }: ShoppingCartProps) => {
                 <p>Subtotal</p>
                 <p>{formatPrice(totalPrice)}</p>
               </div>
-              <Button className="w-full bg-cafePurple hover:bg-cafePurple-dark" onClick={handleCheckout}>
-                Checkout
+              <Button 
+                className="w-full bg-cafePurple hover:bg-cafePurple-dark" 
+                asChild
+              >
+                <Link to="/checkout" onClick={handleClose}>Checkout</Link>
               </Button>
               <div className="mt-4 flex justify-between">
                 <Button 
