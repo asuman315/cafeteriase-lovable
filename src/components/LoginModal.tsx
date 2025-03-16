@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -13,9 +12,10 @@ interface LoginModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
+  forceOpen?: boolean;
 }
 
-const LoginModal = ({ open, onOpenChange, onSuccess }: LoginModalProps) => {
+const LoginModal = ({ open, onOpenChange, onSuccess, forceOpen = false }: LoginModalProps) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,6 +24,13 @@ const LoginModal = ({ open, onOpenChange, onSuccess }: LoginModalProps) => {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
+  const handleOpenChange = (newOpen: boolean) => {
+    if (forceOpen && !newOpen) {
+      return;
+    }
+    onOpenChange(newOpen);
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -31,7 +38,6 @@ const LoginModal = ({ open, onOpenChange, onSuccess }: LoginModalProps) => {
 
     try {
       if (isLogin) {
-        // Handle login
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -46,7 +52,6 @@ const LoginModal = ({ open, onOpenChange, onSuccess }: LoginModalProps) => {
         
         onSuccess();
       } else {
-        // Handle signup
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -73,14 +78,13 @@ const LoginModal = ({ open, onOpenChange, onSuccess }: LoginModalProps) => {
     }
   };
 
-  // Helper function to pre-fill admin credentials
   const fillAdminCredentials = () => {
     setEmail("asumanssendegeya@gmail.com");
     setPassword("Sasuman883@");
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>

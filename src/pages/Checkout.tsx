@@ -132,7 +132,7 @@ const Checkout = () => {
 
   if (cartItems.length === 0 && step !== CheckoutStep.CONFIRMATION) {
     return (
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
+      <div className="container mx-auto px-4 py-12 max-w-4xl flex items-center justify-center min-h-[70vh]">
         <div className="text-center">
           <h1 className="text-3xl font-bold mb-4">Your cart is empty</h1>
           <p className="text-muted-foreground mb-8">Add some items to your cart before proceeding to checkout.</p>
@@ -144,7 +144,7 @@ const Checkout = () => {
 
   if (authLoading) {
     return (
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
+      <div className="container mx-auto px-4 py-12 max-w-4xl flex items-center justify-center min-h-[70vh]">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
           <p className="text-muted-foreground">Loading...</p>
@@ -154,16 +154,17 @@ const Checkout = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12 max-w-5xl animate-fade-in">
+    <div className="container mx-auto px-4 py-12 max-w-5xl animate-fade-in flex flex-col items-center">
       <LoginModal 
         open={isAuthModalOpen} 
         onOpenChange={setIsAuthModalOpen}
         onSuccess={handleAuthSuccess}
+        forceOpen={!user && isAuthModalOpen}
       />
       
-      <div className="mb-12 text-center">
+      <div className="mb-12 text-center max-w-3xl">
         <h1 className="text-4xl font-bold mb-3">Checkout</h1>
-        <p className="text-muted-foreground max-w-lg mx-auto">
+        <p className="text-muted-foreground mx-auto">
           {step === CheckoutStep.SELECT_METHOD && "Choose your preferred payment method to continue."}
           {step === CheckoutStep.DELIVERY_PREFERENCES && "Please provide your delivery preferences."}
           {step === CheckoutStep.SHIPPING_INFO && "Please provide your delivery information."}
@@ -171,8 +172,8 @@ const Checkout = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-        <div className={`md:col-span-${step === CheckoutStep.CONFIRMATION ? "5" : "3"}`}>
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-8 w-full">
+        <div className={`md:col-span-${step === CheckoutStep.CONFIRMATION ? "5" : "3"} ${step === CheckoutStep.CONFIRMATION ? "mx-auto max-w-2xl w-full" : ""}`}>
           {step === CheckoutStep.SELECT_METHOD && (
             <div className="grid gap-6">
               <Card className="hover:shadow-lg transition-shadow duration-300">
@@ -247,7 +248,7 @@ const Checkout = () => {
           )}
 
           {step === CheckoutStep.CONFIRMATION && (
-            <Card className="animate-scale-in mx-auto max-w-xl">
+            <Card className="animate-scale-in w-full">
               <CardHeader>
                 <div className="flex items-center justify-center mb-4">
                   <CheckCircle2 className="h-16 w-16 text-green-500" />
@@ -290,8 +291,8 @@ const Checkout = () => {
                   </div>
                 </div>
               </CardContent>
-              <CardFooter>
-                <Button onClick={() => navigate("/")} className="w-full">
+              <CardFooter className="flex justify-center">
+                <Button onClick={() => navigate("/")} className="w-full max-w-xs">
                   Continue Shopping
                 </Button>
               </CardFooter>
