@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Menu, X } from "lucide-react";
+import { Menu, X, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import UserMenu from "@/components/UserMenu";
 import { Link } from "react-router-dom";
@@ -95,7 +95,7 @@ const NavBar = ({ onCartClick, cartItemCount: propCartItemCount }: NavBarProps) 
                   isScrolled ? "" : "text-white hover:bg-white/10"
                 )}
               >
-                <ShoppingCart className="w-5 h-5" />
+                <ShoppingBag className="w-5 h-5" />
                 {cartItemCount > 0 && (
                   <span className="absolute -top-2 -right-2 bg-cafePurple text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                     {cartItemCount}
@@ -129,7 +129,7 @@ const NavBar = ({ onCartClick, cartItemCount: propCartItemCount }: NavBarProps) 
                   isScrolled ? "" : "text-white hover:bg-white/10"
                 )}
               >
-                <ShoppingCart className="w-5 h-5" />
+                <ShoppingBag className="w-5 h-5" />
                 {cartItemCount > 0 && (
                   <span className="absolute -top-2 -right-2 bg-cafePurple text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                     {cartItemCount}
