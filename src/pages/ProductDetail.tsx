@@ -104,6 +104,11 @@ const ProductDetail = () => {
     setIsCartOpen(true);
   };
 
+  const stripRichText = (text: string) => {
+    if (!text) return "";
+    return text.replace(/<[^>]*>/g, '');
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -141,15 +146,15 @@ const ProductDetail = () => {
           </div>
           
           <div className="space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
+            <div className="bg-cafePurple/10 p-6 rounded-lg">
+              <h1 className="text-3xl font-bold mb-2 text-cafePurple">{product.name}</h1>
               <div className="flex items-center space-x-2 mb-4">
                 <span className="text-xl font-semibold">${product.price.toFixed(2)}</span>
-                <span className="px-3 py-1 bg-cafePurple/10 text-cafePurple text-sm rounded-full">
+                <span className="px-3 py-1 bg-cafePurple/20 text-cafePurple text-sm rounded-full">
                   {product.category}
                 </span>
               </div>
-              <p className="text-muted-foreground">{product.description}</p>
+              <p className="text-gray-700">{stripRichText(product.description)}</p>
             </div>
             
             <div className="py-4 border-t border-b">
