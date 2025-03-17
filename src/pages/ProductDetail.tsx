@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -146,15 +147,15 @@ const ProductDetail = () => {
           </div>
           
           <div className="space-y-6">
-            <div className="bg-cafePurple/10 p-6 rounded-lg">
-              <h1 className="text-3xl font-bold mb-2 text-cafePurple">{product.name}</h1>
+            <div className="bg-cafePurple p-6 rounded-lg text-white">
+              <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
               <div className="flex items-center space-x-2 mb-4">
                 <span className="text-xl font-semibold">${product.price.toFixed(2)}</span>
-                <span className="px-3 py-1 bg-cafePurple/20 text-cafePurple text-sm rounded-full">
+                <span className="px-3 py-1 bg-white/20 text-white text-sm rounded-full">
                   {product.category}
                 </span>
               </div>
-              <p className="text-gray-700">{stripRichText(product.description)}</p>
+              <p>{stripRichText(product.description)}</p>
             </div>
             
             <div className="py-4 border-t border-b">
