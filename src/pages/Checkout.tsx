@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useCart } from "@/hooks/use-cart";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -124,7 +123,6 @@ const Checkout = () => {
 
   const handleAuthSuccess = () => {
     setIsAuthModalOpen(false);
-    // Continue with checkout
     toast.success("Authentication successful", {
       description: "You can now continue with your checkout",
     });
@@ -176,7 +174,7 @@ const Checkout = () => {
       {step === CheckoutStep.SELECT_METHOD && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl mx-auto">
           <div className="space-y-8">
-            <Card className="hover:shadow-lg transition-shadow duration-300 w-full h-full">
+            <Card className="hover:shadow-lg transition-shadow duration-300 w-full h-full flex flex-col">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-2xl">
                   <Truck className="h-6 w-6" />
@@ -186,13 +184,13 @@ const Checkout = () => {
                   Pay with cash when your order is delivered to your doorstep
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-600 mb-6">
+              <CardContent className="flex-grow">
+                <p className="text-sm text-gray-600">
                   Our delivery personnel will collect payment when they deliver your order.
                   You can inspect your items before paying.
                 </p>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="mt-auto">
                 <Button 
                   onClick={() => handleSelectPaymentMethod(PaymentMethod.ON_DELIVERY)} 
                   className="w-full bg-cafePurple hover:bg-cafePurple-dark"
@@ -203,7 +201,7 @@ const Checkout = () => {
               </CardFooter>
             </Card>
 
-            <Card className="hover:shadow-lg transition-shadow duration-300 w-full h-full">
+            <Card className="hover:shadow-lg transition-shadow duration-300 w-full h-full flex flex-col">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-2xl">
                   <CreditCard className="h-6 w-6" />
@@ -213,13 +211,13 @@ const Checkout = () => {
                   Secure, fast payments with credit or debit card
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-600 mb-6">
+              <CardContent className="flex-grow">
+                <p className="text-sm text-gray-600">
                   You'll be redirected to Stripe's secure payment page to complete your purchase.
                   All major credit and debit cards accepted.
                 </p>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="mt-auto">
                 <Button 
                   onClick={() => handleSelectPaymentMethod(PaymentMethod.STRIPE)} 
                   className="w-full bg-cafePurple hover:bg-cafePurple-dark"
