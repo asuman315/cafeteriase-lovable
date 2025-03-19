@@ -1,38 +1,45 @@
 
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react';
-import { useChat } from '@/contexts/ChatContext';
 
-const ChatInput: React.FC = () => {
+interface ChatInputProps {
+  onSendMessage: (message: string) => void;
+  isLoading?: boolean;
+}
+
+const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading = false }) => {
   const [message, setMessage] = useState('');
-  const { addMessage, isLoading } = useChat();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (message.trim() === '') return;
     
-    addMessage('user', message);
-    setMessage('');
+    if (message.trim() && !isLoading) {
+      onSendMessage(message.trim());
+      setMessage('');
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center space-x-2">
+    <form onSubmit={handleSubmit} className="flex items-center gap-2">
       <input
         type="text"
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         placeholder="Type your message..."
-        className="flex-1 px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-cafePurple focus:border-transparent"
+        className="flex-1 rounded-full border border-gray-300 py-2 px-4 focus:outline-none focus:ring-2 focus:ring-cafePurple focus:border-transparent"
         disabled={isLoading}
       />
-      <Button 
-        type="submit" 
-        className="rounded-full bg-cafePurple hover:bg-cafePurple-dark"
-        disabled={isLoading || message.trim() === ''}
+      <button
+        type="submit"
+        disabled={!message.trim() || isLoading}
+        className={`rounded-full p-2 flex items-center justify-center ${
+          !message.trim() || isLoading
+            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            : 'bg-cafePurple text-white hover:bg-cafePurple-dark'
+        }`}
       >
-        <Send className="h-5 w-5" />
-      </Button>
+        <Send className="h-4 w-4" />
+      </button>
     </form>
   );
 };

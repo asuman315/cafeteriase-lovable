@@ -1,68 +1,101 @@
 
-import React, { useEffect, useRef } from 'react';
-import { ChatProvider, useChat } from '@/contexts/ChatContext';
-import ChatMessage from '@/components/ChatMessage';
-import ChatInput from '@/components/ChatInput';
+import React, { useState, useRef, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import ChatMessage from './ChatMessage';
+import ChatInput from './ChatInput';
+import { Button } from './ui/button';
+import { useChatContext } from '@/contexts/ChatContext';
 
 interface ChatbotProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const ChatbotContent: React.FC = () => {
-  const { messages, isLoading } = useChat();
+const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
+  const { messages, addMessage, isLoading } = useChatContext();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
 
-  // Scroll to bottom when messages change
   useEffect(() => {
+    // Scroll to bottom when messages change
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto p-4">
-        {messages.map((message) => (
-          <ChatMessage key={message.id} message={message} />
-        ))}
-        {isLoading && (
-          <div className="flex justify-start mb-4">
-            <div className="bg-gray-100 text-gray-800 rounded-lg p-4">
-              <div className="flex space-x-2">
-                <div className="w-2 h-2 rounded-full bg-gray-300 animate-bounce" style={{ animationDelay: '0s' }}></div>
-                <div className="w-2 h-2 rounded-full bg-gray-300 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                <div className="w-2 h-2 rounded-full bg-gray-300 animate-bounce" style={{ animationDelay: '0.4s' }}></div>
-              </div>
-            </div>
-          </div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-      <div className="p-4 border-t">
-        <ChatInput />
-      </div>
-    </div>
-  );
-};
+  useEffect(() => {
+    setMounted(true);
+    
+    // Add welcome message if no messages exist
+    if (messages.length === 0) {
+      addMessage('assistant', 'Hello! I\'m your Cafeteriase virtual assistant. How can I help you today?');
+    }
+    
+    return () => setMounted(false);
+  }, []);
 
-const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
-  
+  if (!mounted) return null;
+
   return (
-    <ChatProvider>
-      <div className="fixed bottom-24 right-6 w-full max-w-md h-[500px] bg-white rounded-lg shadow-xl border border-gray-200 flex flex-col z-50">
-        <div className="bg-cafePurple text-white p-4 flex justify-between items-center rounded-t-lg">
-          <h3 className="font-medium">Customer Support</h3>
-          <button 
-            className="text-white hover:text-gray-200 focus:outline-none"
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-20"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="fixed inset-0 bg-black/40"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={onClose}
+          />
+          
+          <motion.div
+            className="relative w-full max-w-lg max-h-[85vh] bg-white rounded-xl shadow-xl overflow-hidden flex flex-col"
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            transition={{ type: "spring", bounce: 0.3 }}
           >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-        <ChatbotContent />
-      </div>
-    </ChatProvider>
+            {/* Header */}
+            <div className="p-4 border-b flex items-center justify-between bg-cafePurple text-white">
+              <h2 className="text-lg font-semibold">Cafeteriase Assistant</h2>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onClose}
+                className="text-white hover:bg-cafePurple-dark rounded-full"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            
+            {/* Message List */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.map((message) => (
+                <ChatMessage key={message.id} message={message} />
+              ))}
+              <div ref={messagesEndRef} />
+              
+              {isLoading && (
+                <div className="flex items-center space-x-2 text-cafePurple">
+                  <div className="animate-bounce h-2 w-2 bg-cafePurple rounded-full"></div>
+                  <div className="animate-bounce delay-100 h-2 w-2 bg-cafePurple rounded-full"></div>
+                  <div className="animate-bounce delay-200 h-2 w-2 bg-cafePurple rounded-full"></div>
+                </div>
+              )}
+            </div>
+            
+            {/* Input Area */}
+            <div className="p-4 border-t">
+              <ChatInput onSendMessage={(content) => addMessage('user', content)} isLoading={isLoading} />
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
