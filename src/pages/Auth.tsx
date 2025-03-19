@@ -81,20 +81,39 @@ const Auth = () => {
     <div className="min-h-screen flex bg-gray-50">
       {/* Left side - Image */}
       <div className="hidden md:flex md:w-1/2 bg-cafePurple">
-        <div className="w-full h-full bg-cover bg-center" style={{ 
-          backgroundImage: "url('https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundBlendMode: 'overlay',
-          backgroundColor: 'rgba(128, 0, 255, 0.3)'
-        }}>
-          <div className="flex flex-col justify-center items-center h-full text-white p-12">
-            <h1 className="text-4xl font-bold mb-4">Welcome Back</h1>
-            <p className="text-xl max-w-md text-center">
-              Log in to access your account and continue your coffee journey with us.
-            </p>
+        {isLogin ? (
+          // Login image - coffee with latte art
+          <div className="w-full h-full bg-cover bg-center" style={{ 
+            backgroundImage: "url('/lovable-uploads/66f82d04-38c4-4330-a31b-c37be43db678.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundBlendMode: 'overlay',
+            backgroundColor: 'rgba(128, 0, 255, 0.3)'
+          }}>
+            <div className="flex flex-col justify-center items-center h-full text-white p-12">
+              <h1 className="text-4xl font-bold mb-4">Welcome Back</h1>
+              <p className="text-xl max-w-md text-center">
+                Log in to access your account and continue your coffee journey with us.
+              </p>
+            </div>
           </div>
-        </div>
+        ) : (
+          // Signup image - food with red juice
+          <div className="w-full h-full bg-cover bg-center" style={{ 
+            backgroundImage: "url('/lovable-uploads/761a7bca-5d22-4aa4-96da-0d0245885c74.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundBlendMode: 'overlay',
+            backgroundColor: 'rgba(128, 0, 255, 0.3)'
+          }}>
+            <div className="flex flex-col justify-center items-center h-full text-white p-12">
+              <h1 className="text-4xl font-bold mb-4">Join Us Today</h1>
+              <p className="text-xl max-w-md text-center">
+                Create an account to explore our menu and enjoy a personalized experience.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
       
       {/* Right side - Form */}
