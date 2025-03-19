@@ -84,7 +84,7 @@ const Auth = () => {
         {isLogin ? (
           // Login image - coffee with latte art
           <div className="w-full h-full bg-cover bg-center" style={{ 
-            backgroundImage: "url('/lovable-uploads/66f82d04-38c4-4330-a31b-c37be43db678.png')",
+            backgroundImage: "url(/lovable-uploads/66f82d04-38c4-4330-a31b-c37be43db678.png)",
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundBlendMode: 'overlay',
@@ -100,7 +100,7 @@ const Auth = () => {
         ) : (
           // Signup image - food with red juice
           <div className="w-full h-full bg-cover bg-center" style={{ 
-            backgroundImage: "url('/lovable-uploads/761a7bca-5d22-4aa4-96da-0d0245885c74.png')",
+            backgroundImage: "url(/lovable-uploads/761a7bca-5d22-4aa4-96da-0d0245885c74.png)",
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundBlendMode: 'overlay',
