@@ -61,6 +61,7 @@ const Checkout = () => {
   }, [clearCart, location.search]);
 
   // Check authentication status
+  //console.log("user", user, "Is Auth Modal Open", isAuthModalOpen, "Is auth loading", authLoading);
   useEffect(() => {
     if (!authLoading && !user && cartItems.length > 0) {
       setIsAuthModalOpen(true);
