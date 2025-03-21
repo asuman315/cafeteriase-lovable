@@ -25,8 +25,11 @@ interface CheckoutSessionRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
+  console.log("Checkout function invoked with method:", req.method);
+  
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
+    console.log("Handling CORS preflight request");
     return new Response(null, { headers: corsHeaders });
   }
 
@@ -37,30 +40,63 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("STRIPE_SECRET_KEY is not set");
     }
 
+    console.log("Initializing Stripe client");
     const stripe = new Stripe(stripeSecretKey, {
       apiVersion: "2023-10-16",
     });
 
     // Parse request body
-    const requestData = await req.json();
-    console.log("Request data:", JSON.stringify(requestData));
+    console.log("Parsing request body");
+    const requestText = await req.text();
+    console.log("Request body (raw):", requestText);
+    
+    // Handle empty body
+    if (!requestText) {
+      console.error("Empty request body");
+      return new Response(
+        JSON.stringify({ success: false, error: "Empty request body" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+    
+    let requestData;
+    try {
+      requestData = JSON.parse(requestText);
+      console.log("Request data (parsed):", JSON.stringify(requestData));
+    } catch (parseError) {
+      console.error("Error parsing JSON request body:", parseError);
+      return new Response(
+        JSON.stringify({ success: false, error: "Invalid JSON in request body" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
 
     // Validate request body
     if (!requestData || typeof requestData !== "object") {
+      console.error("Invalid request format");
       throw new Error("Invalid request format");
     }
 
     const { items, customerEmail, successUrl, cancelUrl } = requestData as CheckoutSessionRequest;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
+      console.error("No items provided or invalid items format:", items);
       throw new Error("No items provided or invalid items format");
     }
 
     if (!successUrl) {
+      console.error("Success URL is required but not provided");
       throw new Error("Success URL is required");
     }
 
     if (!cancelUrl) {
+      console.error("Cancel URL is required but not provided");
       throw new Error("Cancel URL is required");
     }
 
@@ -94,6 +130,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Create Stripe checkout session
     try {
+      console.log("Creating Stripe checkout session...");
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         line_items: lineItems,
@@ -103,7 +140,7 @@ const handler = async (req: Request): Promise<Response> => {
         customer_email: customerEmail,
       });
 
-      console.log("Checkout session created:", session.id);
+      console.log("Checkout session created successfully:", session.id);
       console.log("Checkout URL:", session.url);
 
       return new Response(JSON.stringify({ id: session.id, url: session.url }), {

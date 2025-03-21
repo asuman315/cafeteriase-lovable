@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useCart } from "@/hooks/use-cart";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -40,7 +39,10 @@ const Checkout = () => {
   const location = useLocation();
   const { user, isLoading: authLoading } = useAuth();
 
-  // Check query parameters for success or canceled payment status
+  useEffect(() => {
+    console.log("user", user, "Is Auth Modal Open", isAuthModalOpen, "Is auth loading", authLoading);
+  }, [user, isAuthModalOpen, authLoading]);
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const success = urlParams.get("success");
@@ -65,6 +67,8 @@ const Checkout = () => {
   useEffect(() => {
     if (!authLoading && !user && cartItems.length > 0) {
       setIsAuthModalOpen(true);
+    } else if (user) {
+      setIsAuthModalOpen(false);
     }
   }, [user, authLoading, cartItems.length]);
 
@@ -74,6 +78,13 @@ const Checkout = () => {
       
       const successUrl = `${window.location.origin}/checkout?success=true`;
       const cancelUrl = `${window.location.origin}/checkout?canceled=true`;
+
+      console.log("Creating Stripe checkout session with:", {
+        items: cartItems,
+        customerEmail: user?.email,
+        successUrl,
+        cancelUrl,
+      });
 
       const { data, error } = await supabase.functions.invoke("create-checkout-session", {
         body: {
@@ -85,13 +96,16 @@ const Checkout = () => {
       });
 
       if (error) {
+        console.error("Stripe checkout error:", error);
         throw new Error(error.message || "Failed to create checkout session");
       }
+
+      console.log("Stripe checkout response:", data);
 
       if (data?.url) {
         window.location.href = data.url;
       } else {
-        throw new Error("Failed to create checkout session");
+        throw new Error("Failed to create checkout session: No URL returned");
       }
     } catch (error: any) {
       console.error("Error creating checkout session:", error);
@@ -107,7 +121,6 @@ const Checkout = () => {
     if (method === PaymentMethod.ON_DELIVERY) {
       setStep(CheckoutStep.SHIPPING_INFO);
     } else {
-      // For Stripe, we initiate the checkout session
       createStripeCheckoutSession();
     }
   };
