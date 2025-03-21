@@ -87,13 +87,12 @@ const ShippingForm = ({ onSubmit }: ShippingFormProps) => {
       console.error("Failed to send order confirmation:", error);
       
       // More user-friendly error message
-      toast.error("There was a problem processing your order", {
-        description: error.message || "Please try again or contact support.",
+      toast.error("There was a problem sending the confirmation email", {
+        description: error.message || "Your order has been placed but you may not receive an email confirmation.",
         duration: 5000,
       });
       
       // Still proceed with checkout even if email fails
-      // This is a business decision - you might want to not proceed if email is critical
       onSubmit(values);
     } finally {
       setIsSubmitting(false);

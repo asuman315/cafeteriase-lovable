@@ -47,6 +47,11 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error("No items provided");
     }
 
+    // Add logs for debugging
+    console.log("Creating checkout session with items:", JSON.stringify(items));
+    console.log("Success URL:", successUrl);
+    console.log("Cancel URL:", cancelUrl);
+
     // Format line items for Stripe
     const lineItems = items.map((item) => ({
       price_data: {
@@ -70,6 +75,7 @@ const handler = async (req: Request): Promise<Response> => {
       customer_email: customerEmail,
     });
 
+    console.log("Checkout session created:", session.id);
     return new Response(JSON.stringify({ id: session.id, url: session.url }), {
       status: 200,
       headers: {

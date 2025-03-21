@@ -33,6 +33,8 @@ export async function sendOrderConfirmationEmail(
   totalPrice: number
 ) {
   try {
+    console.log("Sending order confirmation email to:", customerEmail);
+    
     // Use the supabase client to invoke the edge function
     const { data, error } = await supabase.functions.invoke("send-order-confirmation", {
       body: {
@@ -44,9 +46,11 @@ export async function sendOrderConfirmationEmail(
     });
 
     if (error) {
+      console.error("Supabase function error:", error);
       throw new Error(error.message || "Failed to send order confirmation");
     }
 
+    console.log("Order confirmation email sent successfully");
     return data;
   } catch (error) {
     console.error("Error sending order confirmation email:", error);

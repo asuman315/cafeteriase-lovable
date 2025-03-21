@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useCart } from "@/hooks/use-cart";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -39,6 +40,27 @@ const Checkout = () => {
   const location = useLocation();
   const { user, isLoading: authLoading } = useAuth();
 
+  // Check query parameters for success or canceled payment status
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get("success");
+    const canceled = urlParams.get("canceled");
+
+    if (success === "true") {
+      setStep(CheckoutStep.CONFIRMATION);
+      clearCart();
+      window.history.replaceState({}, document.title, "/checkout");
+    } else if (canceled === "true") {
+      toast.error("Payment was canceled", {
+        description: "You can try again or choose a different payment method",
+      });
+      setPaymentMethod(null);
+      setStep(CheckoutStep.SELECT_METHOD);
+      window.history.replaceState({}, document.title, "/checkout");
+    }
+  }, [clearCart, location.search]);
+
+  // Check authentication status
   useEffect(() => {
     if (!authLoading && !user && cartItems.length > 0) {
       setIsAuthModalOpen(true);
@@ -79,30 +101,12 @@ const Checkout = () => {
     }
   };
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const success = urlParams.get("success");
-    const canceled = urlParams.get("canceled");
-
-    if (success === "true") {
-      setStep(CheckoutStep.CONFIRMATION);
-      clearCart();
-      window.history.replaceState({}, document.title, "/checkout");
-    } else if (canceled === "true") {
-      toast.error("Payment was canceled", {
-        description: "You can try again or choose a different payment method",
-      });
-      setPaymentMethod(null);
-      setStep(CheckoutStep.SELECT_METHOD);
-      window.history.replaceState({}, document.title, "/checkout");
-    }
-  }, [clearCart]);
-
   const handleSelectPaymentMethod = (method: PaymentMethod) => {
     setPaymentMethod(method);
     if (method === PaymentMethod.ON_DELIVERY) {
       setStep(CheckoutStep.SHIPPING_INFO);
     } else {
+      // For Stripe, we initiate the checkout session
       createStripeCheckoutSession();
     }
   };

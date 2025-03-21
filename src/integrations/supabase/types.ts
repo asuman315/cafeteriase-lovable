@@ -176,6 +176,87 @@ export type Database = {
         }
         Relationships: []
       }
+      tours_destinations: {
+        Row: {
+          additional_images: string[] | null
+          best_time: string | null
+          category: string | null
+          created_at: string
+          description: string
+          featured: boolean | null
+          group_size: string | null
+          id: string
+          image_url: string
+          location: string
+          location_type: string | null
+          name: string
+          subtitle: string | null
+          tags: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          additional_images?: string[] | null
+          best_time?: string | null
+          category?: string | null
+          created_at?: string
+          description: string
+          featured?: boolean | null
+          group_size?: string | null
+          id?: string
+          image_url: string
+          location: string
+          location_type?: string | null
+          name: string
+          subtitle?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          additional_images?: string[] | null
+          best_time?: string | null
+          category?: string | null
+          created_at?: string
+          description?: string
+          featured?: boolean | null
+          group_size?: string | null
+          id?: string
+          image_url?: string
+          location?: string
+          location_type?: string | null
+          name?: string
+          subtitle?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tours_images: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
