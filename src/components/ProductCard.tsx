@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { ShoppingCart, Star, Eye, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -94,13 +95,15 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
       transition={{ duration: 0.5, delay: index * 0.1 }}
       whileHover={{ y: -8 }}
     >
-      <Link to={`/product/${product.id}`} className="flex flex-col h-full">
+      <div className="flex flex-col h-full">
         <div className="relative h-64 overflow-hidden">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
-          />
+          <Link to={`/product/${product.id}`}>
+            <img
+              src={product.image}
+              alt={product.name}
+              className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
+            />
+          </Link>
           <div className="absolute top-3 right-3 flex flex-col gap-2">
             {product.featured && (
               <div className="bg-cafePurple text-white p-1.5 rounded-full">
@@ -130,7 +133,7 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
           </div>
         </div>
         
-        <div className="p-5 flex flex-col flex-grow">
+        <Link to={`/product/${product.id}`} className="p-5 flex flex-col flex-grow">
           <div className="flex justify-between items-start mb-2">
             <h3 className="font-semibold text-xl line-clamp-1">{product.name}</h3>
             <span className="text-cafePurple font-semibold">{formatPrice(product.price, product.currency)}</span>
@@ -148,8 +151,8 @@ const ProductCard = ({ product, index }: ProductCardProps) => {
             <ShoppingCart className={`mr-2 h-4 w-4 ${isAddingToCart ? 'animate-bounce' : 'group-hover:animate-bounce'}`} /> 
             {isAddingToCart ? "Adding..." : "Add to Cart"}
           </Button>
-        </div>
-      </Link>
+        </Link>
+      </div>
     </motion.div>
   );
 };

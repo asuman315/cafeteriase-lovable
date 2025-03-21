@@ -38,6 +38,16 @@ export async function sendOrderConfirmationEmail(
     console.log("Order items:", JSON.stringify(items));
     console.log("Total price:", totalPrice);
     
+    if (!customerEmail) {
+      console.error("No customer email provided for order confirmation");
+      return { success: false, error: "Customer email is required" };
+    }
+    
+    if (!items || items.length === 0) {
+      console.error("No items provided for order confirmation");
+      return { success: false, error: "Order items are required" };
+    }
+    
     // Use the supabase client to invoke the edge function
     const { data, error } = await supabase.functions.invoke("send-order-confirmation", {
       body: {
