@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 const ProductHeroSection = () => {
   return (
-    <section className="py-16 mt-16 bg-cafePurple-dark text-white relative overflow-hidden">
+    <section className="py-16 bg-cafePurple-dark text-white relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-cafePurple-dark via-cafePurple to-purple-700 opacity-90"></div>
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-3xl mx-auto text-center mb-12">
@@ -41,7 +41,7 @@ const ProductHeroSection = () => {
             </Button>
             <Button 
               variant="outline" 
-              className="border-white text-white hover:bg-white/10"
+              className="border-white text-white bg-transparent hover:bg-white/10"
               asChild
             >
               <a href="#products">Browse Menu</a>

@@ -60,6 +60,9 @@ const NavBar = ({ onCartClick, cartItemCount: propCartItemCount }: NavBarProps) 
     return false;
   };
 
+  // check if location.pathname is a product detail page
+  const isProductDetailPage = location.pathname.includes("/product/");
+
   return (
     <>
       <nav
@@ -74,7 +77,7 @@ const NavBar = ({ onCartClick, cartItemCount: propCartItemCount }: NavBarProps) 
           <div className="flex items-center justify-between">
             <Link to="/" className={cn(
               "font-bold text-2xl transition-colors duration-300",
-              isScrolled ? "text-cafePurple-dark" : "text-white"
+              isScrolled ? "text-cafePurple-dark" : `${isProductDetailPage ? "text-cafePurple" : "text-white"}`
             )}>
               Cafeteriase
             </Link>
@@ -92,7 +95,7 @@ const NavBar = ({ onCartClick, cartItemCount: propCartItemCount }: NavBarProps) 
                         ? "text-cafePurple font-semibold" 
                         : isScrolled
                           ? "text-gray-700 hover:text-cafePurple"
-                          : "text-white hover:text-white/80"
+                          : `${isProductDetailPage ? "text-cafePurple" : "text-white"}`
                     )}
                   >
                     {link.name}
@@ -106,13 +109,13 @@ const NavBar = ({ onCartClick, cartItemCount: propCartItemCount }: NavBarProps) 
                   variant="ghost" 
                   className={cn(
                     "relative",
-                    isScrolled ? "" : "text-white hover:bg-white/10"
+                    isScrolled ? "" : `${isProductDetailPage ? "text-cafePurple" : "text-white"}`
                   )}
                 >
                   <ShoppingBag className="w-5 h-5" />
                 </Button>
                 {cartItemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-cafePurple text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="absolute top-1 right-1 bg-cafePurple text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                     {cartItemCount}
                   </span>
                 )}
@@ -141,7 +144,7 @@ const NavBar = ({ onCartClick, cartItemCount: propCartItemCount }: NavBarProps) 
                   variant="ghost" 
                   size="sm" 
                   className={cn(
-                    isScrolled ? "" : "text-white hover:bg-white/10"
+                    isScrolled ? "" : `${isProductDetailPage ? "text-cafePurple" : "text-white"}`
                   )}
                 >
                   <ShoppingBag className="w-5 h-5" />
@@ -158,7 +161,7 @@ const NavBar = ({ onCartClick, cartItemCount: propCartItemCount }: NavBarProps) 
               <Button
                 variant="ghost"
                 size="sm"
-                className={isScrolled ? "" : "text-white hover:bg-white/10"}
+                className={isScrolled ? "" : `${isProductDetailPage ? "text-cafePurple" : "text-white"}`}
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
                 {isMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}

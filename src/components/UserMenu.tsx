@@ -17,6 +17,9 @@ const UserMenu = ({ isScrolled }: UserMenuProps) => {
   const { toast } = useToast();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
+  // check if location.pathname is a product detail page
+  const isProductDetailPage = location.pathname.includes("/product/");
+
   const handleSignOut = async () => {
     setIsLoggingOut(true);
     try {
@@ -57,7 +60,7 @@ const UserMenu = ({ isScrolled }: UserMenuProps) => {
       <Button
         variant="ghost"
         size="sm"
-        className={isScrolled ? "text-gray-700" : "text-white"}
+        className={isScrolled ? "text-gray-700" : `${isProductDetailPage ? "text-cafePurple" : "text-white"}`}
         onClick={() => navigate("/auth")}
       >
         <LogInIcon className="w-4 h-4 mr-2" />

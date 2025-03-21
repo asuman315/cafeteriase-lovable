@@ -134,6 +134,9 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen">
+      <section>
+        
+      </section>
       <NavBar onCartClick={handleCartClick} cartItemCount={cartItemCount} />
       
       <main className="container mx-auto px-4 py-16 pt-32">

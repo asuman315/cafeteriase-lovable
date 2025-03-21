@@ -250,7 +250,7 @@ const Products = () => {
       <NavBar onCartClick={handleCartClick} cartItemCount={cartItemCount} />
       
       {/* Header Section */}
-      <header className="bg-cafePurple-dark text-white py-6">
+      <header className="bg-cafePurple-dark text-white py-20">
         <div className="container mx-auto px-4">
           <h1 className="text-2xl md:text-3xl font-bold">Our Products</h1>
           <p className="text-sm md:text-base opacity-80">Discover our premium offerings</p>
@@ -501,7 +501,7 @@ const Products = () => {
         </section>
       )}
       
-      <TeamSection />
+      {/* <TeamSection /> */}
       <ContactSection />
       <Footer />
       <AdminCreateButton />
