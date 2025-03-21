@@ -62,8 +62,6 @@ const Checkout = () => {
     }
   }, [clearCart, location.search]);
 
-  // Check authentication status
-  //console.log("user", user, "Is Auth Modal Open", isAuthModalOpen, "Is auth loading", authLoading);
   useEffect(() => {
     if (!authLoading && !user && cartItems.length > 0) {
       setIsAuthModalOpen(true);
@@ -150,7 +148,7 @@ const Checkout = () => {
     return (
       <div className="container mx-auto px-4 py-12 max-w-4xl flex items-center justify-center min-h-[70vh]">
         <div className="text-center">
-          <h1 className="text-3xl font-bold mb-4">Your cart is empty</h1>
+          <h1 className="text-3xl font-bold mb-4 text-foreground">Your cart is empty</h1>
           <p className="text-muted-foreground mb-8">Add some items to your cart before proceeding to checkout.</p>
           <Button onClick={() => navigate("/products")}>Browse Products</Button>
         </div>
@@ -180,7 +178,7 @@ const Checkout = () => {
       />
       
       <div className="mb-12 text-center max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-3">Checkout</h1>
+        <h1 className="text-4xl font-bold mb-3 text-foreground">Checkout</h1>
         <p className="text-muted-foreground mx-auto">
           {step === CheckoutStep.SELECT_METHOD && "Choose your preferred payment method to continue."}
           {step === CheckoutStep.DELIVERY_PREFERENCES && "Please provide your delivery preferences."}
@@ -194,7 +192,7 @@ const Checkout = () => {
           <div className="space-y-8">
             <Card className="hover:shadow-lg transition-shadow duration-300 w-full h-full flex flex-col">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-2xl">
+                <CardTitle className="flex items-center gap-2 text-2xl text-foreground">
                   <Truck className="h-6 w-6" />
                   Pay on Delivery
                 </CardTitle>
@@ -221,7 +219,7 @@ const Checkout = () => {
 
             <Card className="hover:shadow-lg transition-shadow duration-300 w-full h-full flex flex-col">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-2xl">
+                <CardTitle className="flex items-center gap-2 text-2xl text-foreground">
                   <CreditCard className="h-6 w-6" />
                   Pay with Stripe
                 </CardTitle>
