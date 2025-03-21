@@ -33,6 +33,7 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeSecretKey) {
+      console.error("Missing STRIPE_SECRET_KEY environment variable");
       throw new Error("STRIPE_SECRET_KEY is not set");
     }
 
@@ -41,48 +42,92 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     // Parse request body
-    const { items, customerEmail, successUrl, cancelUrl }: CheckoutSessionRequest = await req.json();
+    const requestData = await req.json();
+    console.log("Request data:", JSON.stringify(requestData));
 
-    if (!items || items.length === 0) {
-      throw new Error("No items provided");
+    // Validate request body
+    if (!requestData || typeof requestData !== "object") {
+      throw new Error("Invalid request format");
+    }
+
+    const { items, customerEmail, successUrl, cancelUrl } = requestData as CheckoutSessionRequest;
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      throw new Error("No items provided or invalid items format");
+    }
+
+    if (!successUrl) {
+      throw new Error("Success URL is required");
+    }
+
+    if (!cancelUrl) {
+      throw new Error("Cancel URL is required");
     }
 
     // Add logs for debugging
     console.log("Creating checkout session with items:", JSON.stringify(items));
     console.log("Success URL:", successUrl);
     console.log("Cancel URL:", cancelUrl);
+    console.log("Customer email:", customerEmail);
 
     // Format line items for Stripe
-    const lineItems = items.map((item) => ({
-      price_data: {
-        currency: item.currency?.toLowerCase() || "usd",
-        product_data: {
-          name: item.name,
-          images: [item.image],
+    const lineItems = items.map((item) => {
+      if (!item.name || typeof item.price !== 'number' || !item.image) {
+        console.error("Invalid item:", JSON.stringify(item));
+        throw new Error(`Invalid item data: ${item.id}`);
+      }
+
+      return {
+        price_data: {
+          currency: item.currency?.toLowerCase() || "usd",
+          product_data: {
+            name: item.name,
+            images: item.image ? [item.image] : [],
+          },
+          unit_amount: Math.round(item.price * 100), // Convert to cents
         },
-        unit_amount: Math.round(item.price * 100), // Convert to cents
-      },
-      quantity: item.quantity,
-    }));
+        quantity: item.quantity || 1,
+      };
+    });
+
+    console.log("Formatted line items:", JSON.stringify(lineItems));
 
     // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: lineItems,
-      mode: "payment",
-      success_url: successUrl,
-      cancel_url: cancelUrl,
-      customer_email: customerEmail,
-    });
+    try {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: lineItems,
+        mode: "payment",
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        customer_email: customerEmail,
+      });
 
-    console.log("Checkout session created:", session.id);
-    return new Response(JSON.stringify({ id: session.id, url: session.url }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
-    });
+      console.log("Checkout session created:", session.id);
+      console.log("Checkout URL:", session.url);
+
+      return new Response(JSON.stringify({ id: session.id, url: session.url }), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          ...corsHeaders,
+        },
+      });
+    } catch (stripeError: any) {
+      console.error("Stripe API error:", stripeError);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: `Stripe error: ${stripeError.message}`,
+          code: stripeError.code || "unknown",
+          type: stripeError.type || "unknown"
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
   } catch (error: any) {
     console.error("Error in create-checkout-session function:", error);
     return new Response(

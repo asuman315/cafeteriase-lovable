@@ -61,8 +61,10 @@ const ShippingForm = ({ onSubmit }: ShippingFormProps) => {
     setIsSubmitting(true);
     
     try {
+      console.log("Processing order submission:", values);
+      
       // Send order confirmation email
-      await sendOrderConfirmationEmail(
+      const emailResult = await sendOrderConfirmationEmail(
         values.email,
         {
           fullName: values.fullName,
@@ -76,24 +78,29 @@ const ShippingForm = ({ onSubmit }: ShippingFormProps) => {
         totalPrice
       );
       
-      toast.success("Order confirmation email sent!", {
-        description: "Check your email for details.",
-        duration: 3000,
-      });
+      if (emailResult.success) {
+        toast.success("Order confirmation email sent!", {
+          description: "Check your email for details.",
+          duration: 3000,
+        });
+      } else {
+        console.warn("Email sending issue:", emailResult.error);
+        toast.warning("Order placed, but confirmation email may be delayed", {
+          description: "We'll try to send your receipt later.",
+          duration: 3000,
+        });
+      }
       
-      // Complete the checkout process
+      // Complete the checkout process regardless of email status
+      console.log("Completing checkout process");
       onSubmit(values);
     } catch (error: any) {
-      console.error("Failed to send order confirmation:", error);
+      console.error("Failed to complete order:", error);
       
-      // More user-friendly error message
-      toast.error("There was a problem sending the confirmation email", {
-        description: error.message || "Your order has been placed but you may not receive an email confirmation.",
+      toast.error("There was a problem processing your order", {
+        description: error.message || "Please try again or contact support.",
         duration: 5000,
       });
-      
-      // Still proceed with checkout even if email fails
-      onSubmit(values);
     } finally {
       setIsSubmitting(false);
     }
