@@ -106,6 +106,11 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Cancel URL:", cancelUrl);
     console.log("Customer email:", customerEmail);
 
+    // Normalize currency to ensure all items use the same currency
+    // Default to 'usd' or use the first item's currency
+    const defaultCurrency = (items[0]?.currency || 'usd').toLowerCase();
+    console.log(`Using default currency: ${defaultCurrency} for all items`);
+
     // Format line items for Stripe
     const lineItems = items.map((item) => {
       if (!item.name || typeof item.price !== 'number' || !item.image) {
@@ -115,7 +120,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       return {
         price_data: {
-          currency: item.currency?.toLowerCase() || "usd",
+          currency: defaultCurrency, // Use the normalized currency for all items
           product_data: {
             name: item.name,
             images: item.image ? [item.image] : [],
